@@ -127,6 +127,10 @@ SelectPet::SelectPet(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    GlobalVar::poke_skills = poke_skills;
+    GlobalVar::skills_all = skills_all;
+    GlobalVar::pokemons_all = &pokemons_all;
+
     Pokemon pet(0);
     pokemons_all.push_back(pet);
     for (int i = 1; i <= 10; ++i)
@@ -204,7 +208,7 @@ SelectPet::SelectPet(QWidget *parent) :
 
         ski.attack_type = pl.at(6).toInt();
 
-        ski.power = pl.at(7).toInt();
+        ski.power = pl.at(7).toDouble();
 
         ski.prob = pl.at(8).toDouble();
 
@@ -360,6 +364,8 @@ SelectPet::SelectPet(QWidget *parent) :
 
     connect(ui->xg, SIGNAL(currentIndexChanged(int)), this, SLOT(xingge_clicked(int)));
 
+
+    load("2.txt");
 }
 
 SelectPet::~SelectPet()
@@ -543,18 +549,22 @@ void SelectPet::selectAPoke(int row)
 }
 
 
-//返回编号id的宠物的对象,包含基础属性 努力值 性格 技能
+//返回编号id的宠物的对象,包含最终属性 努力值 性格 技能
 Pokemon SelectPet::getPokemon(int id)
 {
 
     Pokemon pok(id);
 
     pok.name = pokemons_all[id].name;
-    pok.hp = pokemons_all[id].hp;
-    pok.ad = pokemons_all[id].ad;
-    pok.dd = pokemons_all[id].dd;
-    pok.ap = pokemons_all[id].ap;
-    pok.dp = pokemons_all[id].dp;
+
+
+    pok.hp = ui->hp->text().toInt();
+    pok.ad = ui->ad->text().toInt();
+    pok.dd = ui->dd->text().toInt();
+    pok.ap = ui->ap->text().toInt();
+    pok.dp = ui->dp->text().toInt();
+    pok.speed = ui->speed->text().toInt();
+
 
     pok.hpn = ui->hp2->value();
     pok.adn = ui->ad2->value();
@@ -588,6 +598,8 @@ void SelectPet::on_modify_clicked()
 {
     int id = ui->id->text().toInt();
     int row = ui->poks->currentRow();
+    if (row < 0 || row >= 6)
+        return;
     pokes[row] = getPokemon(id);
     updatepoks();
 }
@@ -696,6 +708,8 @@ void SelectPet::on_delete_poke_clicked()
     if (pokes.size() == 0)
         return;
     int row = ui->poks->currentRow();
+    if (row < 0 || row >= 6)
+        return;
     pokes.erase(pokes.begin() + row, pokes.begin() + row + 1);
 
     updatepoks();
@@ -723,6 +737,12 @@ void SelectPet::on_save_clicked()
             output = output + "," + pokes[i].name + ",";
             QString buf, buf2;
             int skill_num = pokes[i].skills.size();
+
+            buf.sprintf("%d,%d,%d,%d,%d,%d,",
+                    pokes[i].hp, pokes[i].ad,pokes[i].dd,pokes[i].ap,pokes[i].dp,
+                    pokes[i].speed);
+            output += buf;
+
             buf.sprintf("%d,%d,%d,%d,%d,%d,%d,%d",
                     pokes[i].hpn, pokes[i].adn,pokes[i].ddn,pokes[i].apn,pokes[i].dpn,
                     pokes[i].speedn,
@@ -751,61 +771,80 @@ void SelectPet::on_load_clicked()
         tr("*.txt")); //选择路径
     if(!filename.isEmpty())
     {
+        load(filename);
 
-        pokes.clear();
-
-        QFile file(filename);
-        if (!file.open(QIODevice::ReadOnly)) {
-            return;
-        }
-
-
-        QTextStream * out = new QTextStream(&file);//文本流
-        QString all = out->readAll();
-        //qDebug() << all;
-        QStringList tempOption = all.split("\n");//每行以\n区分
-        for(int i = 0 ; i < tempOption.count() ; i++)
-        {
-            if (tempOption.at(i).size() == 0)
-                continue;
-             QStringList pl = tempOption.at(i).split(",");//一行中的单元格以，区分
-             Pokemon pet(pl.at(0).toInt());
-             pet.name = pl.at(1);
-
-
-
-             pet.hpn = pl.at(2).toInt();
-             pet.adn = pl.at(3).toInt();
-             pet.ddn = pl.at(4).toInt();
-             pet.apn = pl.at(5).toInt();
-             pet.dpn = pl.at(6).toInt();
-             pet.speedn = pl.at(7).toInt();
-
-             pet.nature = pl.at(8).toInt();
-
-             int skill_num = pl.at(9).toInt();
-             for (int j = 10; j < 10+skill_num; ++j)
-             {
-                 QStringList huihe = pl.at(j).split(".");
-                 QPair<int,int> qp;
-
-                 if (huihe.count() == 2)
-                 {
-                     qp.first = huihe.at(0).toInt();
-                     qp.second = huihe.at(1).toInt();
-                 }
-
-                 pet.skills.push_back(qp);
-             }
-
-
-             pokes.push_back(pet);
-
-
-        }
-        file.close();//操作完成后记得关闭文件
-
-        updatepoks();
     }
 
+}
+
+void SelectPet::load(QString filename)
+{
+    pokes.clear();
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+
+    QTextStream * out = new QTextStream(&file);//文本流
+    QString all = out->readAll();
+    //qDebug() << all;
+    QStringList tempOption = all.split("\n");//每行以\n区分
+    for(int i = 0 ; i < tempOption.count() ; i++)
+    {
+        if (tempOption.at(i).size() == 0)
+            continue;
+         QStringList pl = tempOption.at(i).split(",");//一行中的单元格以，区分
+         Pokemon pet(pl.at(0).toInt());
+         pet.name = pl.at(1);
+
+
+
+         pet.hp = pl.at(2).toInt();
+         pet.ad = pl.at(3).toInt();
+         pet.dd = pl.at(4).toInt();
+         pet.ap = pl.at(5).toInt();
+         pet.dp = pl.at(6).toInt();
+         pet.speed = pl.at(7).toInt();
+
+         pet.hpn = pl.at(8).toInt();
+         pet.adn = pl.at(9).toInt();
+         pet.ddn = pl.at(10).toInt();
+         pet.apn = pl.at(11).toInt();
+         pet.dpn = pl.at(12).toInt();
+         pet.speedn = pl.at(13).toInt();
+
+         pet.nature = pl.at(14).toInt();
+
+         int skill_num = pl.at(15).toInt();
+         for (int j = 16; j < 16+skill_num; ++j)
+         {
+             QStringList huihe = pl.at(j).split(".");
+             QPair<int,int> qp;
+
+             if (huihe.count() == 2)
+             {
+                 qp.first = huihe.at(0).toInt();
+                 qp.second = huihe.at(1).toInt();
+             }
+
+             pet.skills.push_back(qp);
+         }
+
+
+         pokes.push_back(pet);
+
+
+    }
+    file.close();//操作完成后记得关闭文件
+
+    updatepoks();
+}
+
+void SelectPet::on_start_clicked()
+{
+    GlobalVar::pokes = &pokes;
+
+    emit startGame();
 }

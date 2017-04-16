@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1031</width>
-    <height>685</height>
+    <width>1055</width>
+    <height>740</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,31 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="SelectPet" name="widget" native="true"/>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="SelectPet" name="selectPet" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="Pk" name="pk" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -25,7 +49,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1031</width>
+     <width>1055</width>
      <height>26</height>
     </rect>
    </property>
@@ -46,6 +70,12 @@
    <class>SelectPet</class>
    <extends>QWidget</extends>
    <header>selectpet.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Pk</class>
+   <extends>QWidget</extends>
+   <header>pk.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -14,7 +14,7 @@ public:
     int pp;
 
     int attack_type; //0变化 1物攻 2魔攻
-    int power;  //威力
+    double power;  //威力
     double prob;    //成功率 >1所有情况必中 =1对方无闪避必中
     int speed = 0;  //先手
     bool special = false;

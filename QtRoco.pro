@@ -16,12 +16,21 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     pokemon.cpp \
     skill.cpp \
-    selectpet.cpp
+    selectpet.cpp \
+    pk.cpp \
+    pok.cpp \
+    team.cpp \
+    globalvar.cpp
 
 HEADERS  += mainwindow.h \
     pokemon.h \
     skill.h \
-    selectpet.h
+    selectpet.h \
+    pk.h \
+    pok.h \
+    team.h \
+    globalvar.h
 
 FORMS    += mainwindow.ui \
-    selectpet.ui
+    selectpet.ui \
+    pk.ui

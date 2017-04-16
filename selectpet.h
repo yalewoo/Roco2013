@@ -12,9 +12,14 @@
 
 #include "pokemon.h"
 #include "skill.h"
+
+#include "globalvar.h"
+
 namespace Ui {
 class SelectPet;
 }
+
+
 
 class SelectPet : public QWidget
 {
@@ -53,7 +58,14 @@ private slots:
 
     void on_save_clicked();
 
+
     void on_load_clicked();
+    void load(QString path);
+
+    void on_start_clicked();
+
+signals:
+    void startGame();
 
 private:
     Ui::SelectPet *ui;
