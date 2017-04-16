@@ -128,20 +128,20 @@ SelectPet::SelectPet(QWidget *parent) :
     ui->setupUi(this);
 
     Pokemon pet(0);
-    pokes.push_back(pet);
+    pokemons_all.push_back(pet);
     for (int i = 1; i <= 10; ++i)
     {
         Skill s;
-        skills[i].push_back(s);
+        skills_all[i].push_back(s);
     }
 
-    QFile file("F:/Project/Roco/QtRoco/roco.csv");
+    QFile file("F:/Project/Roco/QtRoco/data/pokemons_all.csv");
     if(!file.open(QIODevice::ReadOnly))
          qDebug()<<"OPEN FILE FAILED";
 
     QTextStream * out = new QTextStream(&file);//文本流
     QString all = out->readAll();
-    qDebug() << all;
+    //qDebug() << all;
     QStringList tempOption = all.split("\r\n");//每行以\n区分
     for(int i = 0 ; i < tempOption.count() ; i++)
     {
@@ -164,7 +164,7 @@ SelectPet::SelectPet(QWidget *parent) :
          pet.speed = pl.at(9).toInt();
 
 
-         pokes.push_back(pet);
+         pokemons_all.push_back(pet);
 
 
     }
@@ -172,13 +172,13 @@ SelectPet::SelectPet(QWidget *parent) :
 
 
 
-    QFile file2("F:/Project/Roco/skill.csv");
+    QFile file2("F:/Project/Roco/QtRoco/data/skills_all.csv");
     if(!file2.open(QIODevice::ReadOnly))
          qDebug()<<"OPEN FILE FAILED";
 
     out = new QTextStream(&file2);//文本流
     all = out->readAll();
-    qDebug() << all;
+    //qDebug() << all;
     tempOption = all.split("\r\n");//每行以\n区分
     for(int i = 1 ; i < tempOption.count() ; i++)
     {
@@ -264,7 +264,7 @@ SelectPet::SelectPet(QWidget *parent) :
 
 
 
-         skills[type].push_back(ski);
+         skills_all[type].push_back(ski);
 
 
     }
@@ -273,13 +273,13 @@ SelectPet::SelectPet(QWidget *parent) :
 
 
 
-    QFile file3("F:/Project/Roco/poke_skill.csv");
+    QFile file3("F:/Project/Roco/QtRoco/data/poke_skill.csv");
     if(!file3.open(QIODevice::ReadOnly))
          qDebug()<<"OPEN FILE FAILED";
 
     out = new QTextStream(&file3);//文本流
     all = out->readAll();
-    qDebug() << all;
+    //qDebug() << all;
     tempOption = all.split("\r\n");//每行以\n区分
     for(int i = 0 ; i < tempOption.count() ; i++)
     {
@@ -319,7 +319,7 @@ SelectPet::SelectPet(QWidget *parent) :
     {
         QString text;
         text.sprintf("%d ", pokes_have_skills[i]);
-        text += pokes[pokes_have_skills[i]].name;
+        text += pokemons_all[pokes_have_skills[i]].name;
         QListWidgetItem* l = new QListWidgetItem(text, ui->pokes);
         ui->skills->insertItem(i+1, l);
     }
@@ -353,12 +353,12 @@ SelectPet::SelectPet(QWidget *parent) :
     connect(ui->dp2, SIGNAL(valueChanged(int)), this, SLOT(updatedata()));
     connect(ui->speed2, SIGNAL(valueChanged(int)), this, SLOT(updatedata()));
 
-    connect(ui->skills, SIGNAL(currentRowChanged(int)), this, SLOT(addSkill(int)));
-    connect(ui->skills_selected, SIGNAL(currentRowChanged(int)), this, SLOT(addSkill(int)));
+    connect(ui->skills, SIGNAL(currentRowChanged(int)), this, SLOT(displaySkillInfo(int)));
+    connect(ui->skills_selected, SIGNAL(currentRowChanged(int)), this, SLOT(displaySkillInfo(int)));
 
     connect(ui->poks, SIGNAL(currentRowChanged(int)), this, SLOT(updatedata2(int)));
 
-    connect(ui->xg, SIGNAL(currentIndexChanged(int)), this, SLOT(on_xingge_clicked(int)));
+    connect(ui->xg, SIGNAL(currentIndexChanged(int)), this, SLOT(xingge_clicked(int)));
 
 }
 
@@ -371,10 +371,10 @@ void SelectPet::on_ok_clicked()
 {
     static QString idtoPri[17] = {"普","冰","草","虫","电","毒","恶","火","龙","萌","石","水","土","武","械","翼","幽"};
     int id = ui->id->text().toInt();
-    ui->name->setText(pokes.at(id).name);
-    ui->attr->setText(idtoPri[pokes.at(id).attr]);
-    if (pokes.at(id).attr2 != -1)
-        ui->attr2->setText(idtoPri[pokes.at(id).attr2]);
+    ui->name->setText(pokemons_all.at(id).name);
+    ui->attr->setText(idtoPri[pokemons_all.at(id).attr]);
+    if (pokemons_all.at(id).attr2 != -1)
+        ui->attr2->setText(idtoPri[pokemons_all.at(id).attr2]);
     else
         ui->attr2->setText("");
 
@@ -385,7 +385,7 @@ void SelectPet::updatedataWhenChangePok()
 {
     updatedata();
 
-    poke_skills_selected.clear();
+    skills_selected.clear();
     updateSkillsselected();
 }
 
@@ -395,12 +395,12 @@ void SelectPet::updatedata()
     //精力＝[种族值×2＋天赋＋（努力值／4）]×Lv／100＋10＋Lv
     int hp = 0;
     int hp2 = ui->hp2->value();
-    hp = pokes.at(id).hp * 2 + 31 + (hp2 / 4) + 10 + 100;
+    hp = pokemons_all.at(id).hp * 2 + 31 + (hp2 / 4) + 10 + 100;
     ui->hp->setText(QString::number(hp));
 
     //其余＝{[种族值×2＋天赋＋（努力值／4）]×Lv／100＋5}×性格修正
     int ad2 = ui->ad2->value();
-    int ad = pokes.at(id).ad * 2 + 31 + (ad2 / 4) + 5;
+    int ad = pokemons_all.at(id).ad * 2 + 31 + (ad2 / 4) + 5;
     if (ui->adp->isChecked())
         ad *= 1.1;
     if (ui->adm->isChecked())
@@ -408,7 +408,7 @@ void SelectPet::updatedata()
     ui->ad->setText(QString::number(ad));
 
     int dd2 = ui->dd2->value();
-    int dd = pokes.at(id).dd * 2 + 31 + (dd2 / 4) + 5;
+    int dd = pokemons_all.at(id).dd * 2 + 31 + (dd2 / 4) + 5;
     if (ui->ddp->isChecked())
         dd *= 1.1;
     if (ui->ddm->isChecked())
@@ -416,7 +416,7 @@ void SelectPet::updatedata()
     ui->dd->setText(QString::number(dd));
 
     int ap2 = ui->ap2->value();
-    int ap = pokes.at(id).ap * 2 + 31 + (ap2 / 4) + 5;
+    int ap = pokemons_all.at(id).ap * 2 + 31 + (ap2 / 4) + 5;
     if (ui->app->isChecked())
         ap *= 1.1;
     if (ui->apm->isChecked())
@@ -424,7 +424,7 @@ void SelectPet::updatedata()
     ui->ap->setText(QString::number(ap));
 
     int dp2 = ui->dp2->value();
-    int dp = pokes.at(id).dp * 2 + 31 + (dp2 / 4) + 5;
+    int dp = pokemons_all.at(id).dp * 2 + 31 + (dp2 / 4) + 5;
     if (ui->dpp->isChecked())
         dp *= 1.1;
     if (ui->dpm->isChecked())
@@ -432,7 +432,7 @@ void SelectPet::updatedata()
     ui->dp->setText(QString::number(dp));
 
     int speed2 = ui->speed2->value();
-    int speed = pokes.at(id).speed * 2 + 31 + (speed2 / 4) + 5;
+    int speed = pokemons_all.at(id).speed * 2 + 31 + (speed2 / 4) + 5;
     if (ui->speedp->isChecked())
         speed *= 1.1;
     if (ui->speedm->isChecked())
@@ -461,7 +461,7 @@ void SelectPet::updatedata()
         int t2 = poke_skills[id].at(i).second;
 
 
-        QListWidgetItem* l = new QListWidgetItem(skills[t1][t2].name, ui->skills);
+        QListWidgetItem* l = new QListWidgetItem(skills_all[t1][t2].name, ui->skills);
         ui->skills->insertItem(i+1, l);
     }
 
@@ -495,7 +495,7 @@ void SelectPet::updatedata()
 }
 
 //根据性格编号设置性格
-void SelectPet::on_xingge_clicked(int index)
+void SelectPet::xingge_clicked(int index)
 {
     QPair<int,int> qp = xingge_idtoidid(index);
     QRadioButton * btp[6] = {ui->adp, ui->ddp, ui->app, ui->dpp, ui->speedp, ui->nop};
@@ -506,14 +506,15 @@ void SelectPet::on_xingge_clicked(int index)
     updatedata();
 }
 
-void SelectPet::addSkill(int row)
+//显示技能描述
+void SelectPet::displaySkillInfo(int row)
 {
 
     int id = ui->id->text().toInt();
     int t1 = poke_skills[id].at(row).first;
     int t2 = poke_skills[id].at(row).second;
-    Skill & sk = skills[t1][t2];
-    qDebug() << row << "\n";
+    Skill & sk = skills_all[t1][t2];
+    //qDebug() << row << "\n";
     QString text = sk.name;
 
     QString tmp;
@@ -534,7 +535,7 @@ void SelectPet::addSkill(int row)
     ui->skill_descp->setText(text);
 }
 
-
+//通过宠物列表选择宠物
 void SelectPet::selectAPoke(int row)
 {
     ui->id->setText(QString::number(pokes_have_skills[row]));
@@ -542,17 +543,18 @@ void SelectPet::selectAPoke(int row)
 }
 
 
+//返回编号id的宠物的对象,包含基础属性 努力值 性格 技能
 Pokemon SelectPet::getPokemon(int id)
 {
 
     Pokemon pok(id);
 
-    pok.name = pokes[id].name;
-    pok.hp = pokes[id].hp;
-    pok.ad = pokes[id].ad;
-    pok.dd = pokes[id].dd;
-    pok.ap = pokes[id].ap;
-    pok.dp = pokes[id].dp;
+    pok.name = pokemons_all[id].name;
+    pok.hp = pokemons_all[id].hp;
+    pok.ad = pokemons_all[id].ad;
+    pok.dd = pokemons_all[id].dd;
+    pok.ap = pokemons_all[id].ap;
+    pok.dp = pokemons_all[id].dp;
 
     pok.hpn = ui->hp2->value();
     pok.adn = ui->ad2->value();
@@ -563,29 +565,34 @@ Pokemon SelectPet::getPokemon(int id)
 
     pok.nature = ui->xg->currentIndex();
 
-    pok.skills = poke_skills_selected;
+    pok.skills = skills_selected;
 
     return pok;
 }
 
+
+//插入一个宠物
 void SelectPet::on_insert_clicked()
 {
     int id = ui->id->text().toInt();
-    if (poks.size() >= 6)
+    if (pokes.size() >= 6)
         return;
 
-    poks.push_back(getPokemon(id));
+    pokes.push_back(getPokemon(id));
 
     updatepoks();
 }
+
+//修改宠物
 void SelectPet::on_modify_clicked()
 {
     int id = ui->id->text().toInt();
     int row = ui->poks->currentRow();
-    poks[row] = getPokemon(id);
+    pokes[row] = getPokemon(id);
     updatepoks();
 }
 
+//更新队伍
 void SelectPet::updatepoks()
 {
     ui->poks->reset();
@@ -595,11 +602,11 @@ void SelectPet::updatepoks()
 
     ui->poks->setIconSize(QSize(80,80));
 
-    for (int i = 0; i < poks.size(); ++i)
+    for (int i = 0; i < pokes.size(); ++i)
     {
-        QString text = poks.at(i).name;
+        QString text = pokes.at(i).name;
         QString file;
-        int id = poks.at(i).id;
+        int id = pokes.at(i).id;
         file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
 
         QListWidgetItem* l = new QListWidgetItem(QIcon(file), text, ui->poks);
@@ -608,11 +615,16 @@ void SelectPet::updatepoks()
         ui->poks->insertItem(i+1, l);
     }
 
+    QString pek_num;
+    pek_num.sprintf("已选 %d 个宠物", pokes.size());
+    ui->label_poks_num->setText(pek_num);
+
 }
 
+//添加一个技能
 void SelectPet::on_add_skill_clicked()
 {
-    if (poke_skills_selected.size() >= 4)
+    if (skills_selected.size() >= 4)
         return;
 
     int id = ui->id->text().toInt();
@@ -625,64 +637,66 @@ void SelectPet::on_add_skill_clicked()
     qp.second = t2;
 
 
-    poke_skills_selected.push_back(qp);
+    skills_selected.push_back(qp);
 
     updateSkillsselected();
 }
+//更新已选技能列表
 void SelectPet::updateSkillsselected()
 {
     ui->skills_selected->reset();
     ui->skills_selected->clear();
-    for (int i = 0; i < poke_skills_selected.size(); ++i)
+    for (int i = 0; i < skills_selected.size(); ++i)
     {
-        int t1 = poke_skills_selected[i].first;
-        int t2 = poke_skills_selected[i].second;
+        int t1 = skills_selected[i].first;
+        int t2 = skills_selected[i].second;
 
-        QListWidgetItem* l = new QListWidgetItem(skills[t1][t2].name, ui->skills_selected);
+        QListWidgetItem* l = new QListWidgetItem(skills_all[t1][t2].name, ui->skills_selected);
         ui->skills_selected->insertItem(i+1, l);
     }
 }
-
+//删除一个技能
 void SelectPet::on_del_skill_clicked()
 {
-    if (poke_skills_selected.size() == 0)
+    if (skills_selected.size() == 0)
         return;
     int row = ui->skills_selected->currentRow();
-    poke_skills_selected.erase(poke_skills_selected.begin()+row, poke_skills_selected.begin()+row+1);
+    skills_selected.erase(skills_selected.begin()+row, skills_selected.begin()+row+1);
 
     updateSkillsselected();
 }
 
+//显示已经配置过的宠物的所有信息
 void SelectPet::updatedata2(int row)
 {
-    ui->id->setText(QString::number(poks[row].id));
+    ui->id->setText(QString::number(pokes[row].id));
 
-    ui->hp2->setValue(poks[row].hpn);
-    ui->ad2->setValue(poks[row].adn);
-    ui->dd2->setValue(poks[row].ddn);
-    ui->ap2->setValue(poks[row].apn);
-    ui->dp2->setValue(poks[row].dpn);
-    ui->speed2->setValue(poks[row].speedn);
+    ui->hp2->setValue(pokes[row].hpn);
+    ui->ad2->setValue(pokes[row].adn);
+    ui->dd2->setValue(pokes[row].ddn);
+    ui->ap2->setValue(pokes[row].apn);
+    ui->dp2->setValue(pokes[row].dpn);
+    ui->speed2->setValue(pokes[row].speedn);
 
-    on_xingge_clicked(poks[row].nature);
+    xingge_clicked(pokes[row].nature);
 
     updatedata();
 
-    poke_skills_selected.clear();
-    for (int i = 0; i < poks[row].skills.size(); ++i)
-        poke_skills_selected.push_back(poks[row].skills[i]);
+    skills_selected.clear();
+    for (int i = 0; i < pokes[row].skills.size(); ++i)
+        skills_selected.push_back(pokes[row].skills[i]);
 
     updateSkillsselected();
 }
 
 
-
+//从队伍中删除一个宠物
 void SelectPet::on_delete_poke_clicked()
 {
-    if (poks.size() == 0)
+    if (pokes.size() == 0)
         return;
     int row = ui->poks->currentRow();
-    poks.erase(poks.begin() + row, poks.begin() + row + 1);
+    pokes.erase(pokes.begin() + row, pokes.begin() + row + 1);
 
     updatepoks();
 }
@@ -702,22 +716,22 @@ void SelectPet::on_save_clicked()
         }
         QTextStream out(&file);
 
-        for (int i = 0; i < poks.size(); ++i)
+        for (int i = 0; i < pokes.size(); ++i)
         {
             QString output;
-            output = QString::number(poks[i].id);
-            output = output + "," + poks[i].name + ",";
+            output = QString::number(pokes[i].id);
+            output = output + "," + pokes[i].name + ",";
             QString buf, buf2;
-            int skill_num = poks[i].skills.size();
+            int skill_num = pokes[i].skills.size();
             buf.sprintf("%d,%d,%d,%d,%d,%d,%d,%d",
-                    poks[i].hpn, poks[i].adn,poks[i].ddn,poks[i].apn,poks[i].dpn,
-                    poks[i].speedn,
-                        poks[i].nature,
+                    pokes[i].hpn, pokes[i].adn,pokes[i].ddn,pokes[i].apn,pokes[i].dpn,
+                    pokes[i].speedn,
+                        pokes[i].nature,
                         skill_num);
             output += buf;
-            for (int j = 0; j < poks[i].skills.size(); ++j)
+            for (int j = 0; j < pokes[i].skills.size(); ++j)
             {
-                buf.sprintf(",%d.%d", poks[i].skills[j].first, poks[i].skills[j].second);
+                buf.sprintf(",%d.%d", pokes[i].skills[j].first, pokes[i].skills[j].second);
                 output += buf;
             }
 
@@ -728,7 +742,7 @@ void SelectPet::on_save_clicked()
     }
 
 }
-
+//从文本文件加载一个宠物队伍
 void SelectPet::on_load_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this,
@@ -738,7 +752,7 @@ void SelectPet::on_load_clicked()
     if(!filename.isEmpty())
     {
 
-        poks.clear();
+        pokes.clear();
 
         QFile file(filename);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -748,7 +762,7 @@ void SelectPet::on_load_clicked()
 
         QTextStream * out = new QTextStream(&file);//文本流
         QString all = out->readAll();
-        qDebug() << all;
+        //qDebug() << all;
         QStringList tempOption = all.split("\n");//每行以\n区分
         for(int i = 0 ; i < tempOption.count() ; i++)
         {
@@ -785,7 +799,7 @@ void SelectPet::on_load_clicked()
              }
 
 
-             poks.push_back(pet);
+             pokes.push_back(pet);
 
 
         }

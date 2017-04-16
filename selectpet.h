@@ -27,7 +27,7 @@ public:
 private slots:
     void on_ok_clicked();
 
-    void on_xingge_clicked(int index);
+    void xingge_clicked(int index);
 
     void updatedataWhenChangePok(); //更新所有
     void updatedata();  //更新宠物自身属性
@@ -36,7 +36,7 @@ private slots:
 
     void updateSkillsselected();
 
-    void addSkill(int row);
+    void displaySkillInfo(int row);
     void selectAPoke(int row);
 
 
@@ -58,8 +58,8 @@ private slots:
 private:
     Ui::SelectPet *ui;
 
-    QVector<Pokemon> pokes; //记录所有宠物基础信息
-    QVector<Skill> skills[16];  //记录所有技能 分为10类 下标16多余了6
+    QVector<Pokemon> pokemons_all; //记录所有宠物基础信息
+    QVector<Skill> skills_all[16];  //记录所有技能 分为10类 下标16多余了6
 
     QMap<QString, int> skilltoid1;
     QMap<QString, int> skilltoid2;
@@ -68,9 +68,9 @@ private:
 
     QVector<int> pokes_have_skills; //拥有可选技能的宠物id
 
-    QVector<Pokemon> poks;  //用户选的宠物，最多6只
+    QVector<Pokemon> pokes;  //用户选的宠物，最多6只
 
-    QVector<QPair<int,int> > poke_skills_selected;    //已选择的技能
+    QVector<QPair<int,int> > skills_selected;    //已选择的技能
 
 
 
