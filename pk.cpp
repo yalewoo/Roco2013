@@ -20,6 +20,8 @@ Pk::Pk(QWidget *parent) :
     connect(&team1, SIGNAL(addlog(QString)), this, SLOT(log(QString)));
     connect(&team2, SIGNAL(addlog(QString)), this, SLOT(log(QString)));
 
+
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 }
 
 Pk::~Pk()
@@ -54,7 +56,7 @@ void Pk::display()
 void Pk::log(QString log)
 {
     logs += log + "\r\n";
-    qDebug() << "here:" << log;
+    //qDebug() << "here:" << log;
     ui->log->setText(logs);
 
     ui->log->verticalScrollBar()->setValue(ui->log->verticalScrollBar()->maximum());
@@ -92,7 +94,7 @@ void Pk::updateSkills(Team & team)
 {
     QVector<Pok> & pokes = team.poks;
 
-    int id = pokes[team.current_pok].pokemon.id;
+
 
 
     QVector<Skill> *skills_all = GlobalVar::skills_all;
@@ -112,12 +114,17 @@ void Pk::updateSkills(Team & team)
         static QString idtoPri[17] = {"普","冰","草","虫","电","毒","恶","火","龙","萌","石","水","土","武","械","翼","幽"};
         text = text + " " + idtoPri[sk.attr];
 
-        tmp.sprintf("(%d/%d)\n",pokes[team.current_pok].pp[row], sk.pp);
+        int current_pp = pokes[team.current_pok].pp[row];
+        tmp.sprintf("(%d/%d)\n",current_pp, sk.pp);
+
+        if (current_pp == 0)
+            qpb[row]->setEnabled(false);
+
         text += tmp;
 
         static QString attr[3] = {"变化","物理","魔法"};
         text = text + attr[sk.attack_type];
-        tmp.sprintf(" 威力:%d\n", sk.power);
+        tmp.sprintf(" 威力:%.0lf\n", sk.power);
         text += tmp;
 
         text += sk.description;
@@ -151,16 +158,19 @@ void Pk::updatepok1()
         ui->attr2->setText("");
 
     //宠物图片
-    QString file;
-    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
-    QMovie *movie = new QMovie(file);
-    movie->setScaledSize(ui->poke_img->size());
-    ui->poke_img->setMovie(movie);
-    movie->start();
+//    QString file;
+//    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
+//    QMovie *movie = new QMovie(file);
+//    movie->setScaledSize(ui->poke_img->size());
+//    ui->poke_img->setMovie(movie);
+//    movie->start();
 
     QString text;
     text.sprintf("%d/%d", pok.hp, pok.hp_max);
     ui->hp->setText(text);
+
+    ui->hp_bar->setMaximum(pok.hp_max);
+    ui->hp_bar->setValue(pok.hp);
 }
 void Pk::updatepok2()
 {
@@ -179,16 +189,19 @@ void Pk::updatepok2()
         ui->attr2_2->setText("");
 
     //宠物图片
-    QString file;
-    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
-    QMovie *movie = new QMovie(file);
-    movie->setScaledSize(ui->poke_img_2->size());
-    ui->poke_img_2->setMovie(movie);
-    movie->start();
+//    QString file;
+//    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
+//    QMovie *movie = new QMovie(file);
+//    movie->setScaledSize(ui->poke_img_2->size());
+//    ui->poke_img_2->setMovie(movie);
+//    movie->start();
 
     QString text;
     text.sprintf("%d/%d", pok.hp, pok.hp_max);
     ui->hp_2->setText(text);
+
+    ui->hp_2_bar->setMaximum(pok.hp_max);
+    ui->hp_2_bar->setValue(pok.hp);
 }
 
 void Pk::skill_clicked(int i)
@@ -201,7 +214,7 @@ void Pk::skill_clicked(int i)
 
     if (speed1 == speed2)
     {
-        qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
         while (speed1 == speed2)
         {
             speed1 = qrand();
@@ -209,18 +222,27 @@ void Pk::skill_clicked(int i)
         }
     }
 
-    qDebug() <<speed1 << " " << speed2<<endl;
+    //qDebug() <<speed1 << " " << speed2<<endl;
 
     log("回合" + QString::number(huihe) + ":");
     if (speed1 > speed2)
     {
-        team1.attack(choose1, team2);
-        team2.attack(choose2, team1);
+        if (team1.selfStatus())
+        {
+            AttackData res = team1.attack(choose1, team2);
+            if (res.hp_release > 0 && !res.cuimian && !res.bingdong)
+                team2.attack(choose2, team1);
+        }
+
     }
     else
     {
-        team2.attack(choose2, team1);
-        team1.attack(choose1, team2);
+        if (team2.selfStatus())
+        {
+            AttackData res = team2.attack(choose2, team1);
+            if (res.hp_release > 0 && !res.cuimian && !res.bingdong)
+                team1.attack(choose1, team2);
+        }
     }
     ++huihe;
 
@@ -231,7 +253,7 @@ int Pk::calcSpeed(Team & team, int n)
     int speed;
     QVector<Pok> & pokes = team.poks;
     Pok & pok = pokes[team.current_pok];
-    int id = pokes[team.current_pok].pokemon.id;
+
 
     speed = pok.speed;
     int rank = pok.speed_rank;
@@ -279,6 +301,7 @@ void Pk::on_skill4_clicked()
     skill_clicked(3);
 }
 
+//换宠物
 void Pk::on_pushButton_clicked()
 {
     int row = ui->poks->currentRow();
@@ -289,5 +312,5 @@ void Pk::on_pushButton_clicked()
 
 int Pk::computer_ai()
 {
-    return 0;
+    return 1;
 }

@@ -23,6 +23,7 @@ int convertPri(QString s)
     if (s == "械") return 14;
     if (s == "翼") return 15;
     if (s == "幽") return 16;
+    return 0;
 }
 
 int xingge_idid2id(int t1, int t2)
@@ -533,7 +534,7 @@ void SelectPet::displaySkillInfo(int row)
 
     static QString attr[3] = {"变化","攻击","魔法"};
     text = text + "类型：" + attr[sk.attack_type];
-    tmp.sprintf(" 威力:%d\n\n描述：", sk.power);
+    tmp.sprintf(" 威力:%.0lf\n\n描述：", sk.power);
     text += tmp;
 
     text += sk.description;
@@ -796,6 +797,7 @@ void SelectPet::load(QString filename)
         if (tempOption.at(i).size() == 0)
             continue;
          QStringList pl = tempOption.at(i).split(",");//一行中的单元格以，区分
+         int id = pl.at(0).toInt();
          Pokemon pet(pl.at(0).toInt());
          pet.name = pl.at(1);
 
@@ -814,6 +816,9 @@ void SelectPet::load(QString filename)
          pet.apn = pl.at(11).toInt();
          pet.dpn = pl.at(12).toInt();
          pet.speedn = pl.at(13).toInt();
+
+         pet.attr = pokemons_all[id].attr;
+         pet.attr2 = pokemons_all[id].attr2;
 
          pet.nature = pl.at(14).toInt();
 
