@@ -302,4 +302,7 @@ bool Team::selfStatus()
     }
 
 
+    return true;
+
+
 }
