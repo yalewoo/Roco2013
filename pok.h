@@ -29,6 +29,23 @@ public:
 
     int pp[4] = {0};    //各个技能的可用PP
 
+    int jisheng = 0;
+    int zhongdu = 0;
+    int judu = 0;
+
+    int qingxing = 0;
+    int shouhuzhili = 0;
+    int bingtianxuedi = 0;
+    int dadikuanshu = 0;
+    int wudun = 0;
+
+    int add_hp = 0;
+    double add_hp_value = 0;
+
+    int damage_xishou = 0;
+    int damage_xishou_value = 0;
+
+
 
 
 };

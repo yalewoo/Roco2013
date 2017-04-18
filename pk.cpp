@@ -52,6 +52,10 @@ void Pk::display()
     updatepok();
 
     ui->huihe->setText(QString::number(huihe));
+
+    updateStatus();
+
+
 }
 void Pk::log(QString log)
 {
@@ -60,6 +64,42 @@ void Pk::log(QString log)
     ui->log->setText(logs);
 
     ui->log->verticalScrollBar()->setValue(ui->log->verticalScrollBar()->maximum());
+}
+void Pk::updateStatus()
+{
+    ui->status->setText(getStatus(team1));
+    ui->status_2->setText(getStatus(team2));
+}
+QString Pk::getStatus(Team & team)
+{
+    QString res;
+    Pok & pok = team.poks[team.current_pok];
+    if (team.sleep > 0)
+        res += "睡眠 ";
+    if (team.bingdong > 0)
+        res += "冰冻 ";
+
+    if (pok.jisheng > 0)
+        res += "寄生 ";
+    if (pok.judu > 0)
+        res += "剧毒 ";
+    if (pok.zhongdu > 0)
+        res += "中毒 ";
+
+    res += "\n";
+
+    if (pok.ad_rank != 0)
+        res += "攻击" + QString::number(pok.ad_rank) + " ";
+    if (pok.dd_rank != 0)
+        res += "物抗" + QString::number(pok.dd_rank) + " ";
+    if (pok.ap_rank != 0)
+        res += "魔攻" + QString::number(pok.ap_rank) + " ";
+    if (pok.dp_rank != 0)
+        res += "魔抗" + QString::number(pok.dp_rank) + " ";
+    if (pok.speed_rank != 0)
+        res += "速度" + QString::number(pok.speed_rank) + " ";
+
+    return res;
 }
 
 //更换队伍界面更新
@@ -230,8 +270,16 @@ void Pk::skill_clicked(int i)
         if (team1.selfStatus())
         {
             AttackData res = team1.attack(choose1, team2);
+            team1.consume(team2);
             if (res.hp_release > 0 && !res.cuimian && !res.bingdong)
-                team2.attack(choose2, team1);
+            {
+                if (team2.selfStatus())
+                {
+                    team2.attack(choose2, team1);
+                }
+            }
+
+
         }
 
     }
@@ -312,5 +360,5 @@ void Pk::on_pushButton_clicked()
 
 int Pk::computer_ai()
 {
-    return 1;
+    return qrand() % 4;
 }

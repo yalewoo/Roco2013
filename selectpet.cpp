@@ -195,77 +195,81 @@ SelectPet::SelectPet(QWidget *parent) :
          Skill ski(type);
 
 
+         int j;
+         j = 0;
 
-         ski.attr = convertPri(pl.at(1));
-         ski.id = pl.at(2).toInt();
-        ski.name = pl.at(3);
+         ski.attr = convertPri(pl.at(++j));
+         ski.id = pl.at(++j).toInt();
+        ski.name = pl.at(++j);
 
         skilltoid1[ski.name] = type;
         skilltoid2[ski.name] = ski.id;
 
-        ski.description = pl.at(4);
+        ski.description = pl.at(++j);
 
-        ski.pp = pl.at(5).toInt();
+        ski.pp = pl.at(++j).toInt();
 
-        ski.attack_type = pl.at(6).toInt();
+        ski.attack_type = pl.at(++j).toInt();
 
-        ski.power = pl.at(7).toDouble();
+        ski.power = pl.at(++j).toDouble();
+        ski.damage_hard_cap = pl.at(++j).toInt();
+        ski.damage_percent = pl.at(++j).toDouble();
 
-        ski.prob = pl.at(8).toDouble();
+        ski.prob = pl.at(++j).toDouble();
 
-    ski.speed = pl.at(9).toInt();
+    ski.speed = pl.at(++j).toInt();
 
-    ski.special = pl.at(10).toInt() ? 1 : 0;
+    ski.special = pl.at(++j).toInt() ? 1 : 0;
 
-    ski.fandan = pl.at(11).toDouble();
+    ski.fandan = pl.at(++j).toDouble();
 
-        ski.self_adp = pl.at(12).toInt();
-        ski.self_ddp = pl.at(13).toInt();
-        ski.self_app = pl.at(14).toInt();
-        ski.self_dpp = pl.at(15).toInt();
-        ski.self_speedp = pl.at(16).toInt();
+        ski.self_adp = pl.at(++j).toInt();
+        ski.self_ddp = pl.at(++j).toInt();
+        ski.self_app = pl.at(++j).toInt();
+        ski.self_dpp = pl.at(++j).toInt();
+        ski.self_speedp = pl.at(++j).toInt();
 
-        ski.self_status = pl.at(17);
+        ski.self_status = pl.at(++j);
 
-        QStringList huihe = pl.at(18).split("-");
+        QStringList huihe = pl.at(++j).split("-");
         if (huihe.count() == 1)
         {
-            ski.min_time = huihe.at(0).toInt();
+            ski.self_min_time = huihe.at(0).toInt();
         }
         else if (huihe.count() == 2)
         {
-            ski.min_time = huihe.at(0).toInt();
-            ski.max_time = huihe.at(1).toInt();
+            ski.self_min_time = huihe.at(0).toInt();
+            ski.self_max_time = huihe.at(1).toInt();
         }
 
-        ski.value = pl.at(19).toDouble();
+        ski.self_value = pl.at(++j).toDouble();
 
-        ski.prob2 = pl.at(20).toDouble();
+        ski.prob2 = pl.at(++j).toDouble();
 
-        ski.enemy_status = pl.at(21);
+        ski.enemy_status = pl.at(++j);
 
-        QStringList hc = pl.at(22).split("-");
+        QStringList hc = pl.at(++j).split("-");
         if (hc.count() == 1)
         {
-            ski.min_time = hc.at(0).toInt();
+            ski.enemy_min_time = hc.at(0).toInt();
         }
         else if (hc.count() == 2)
         {
-            ski.min_time = hc.at(0).toInt();
-            ski.max_time = hc.at(1).toInt();
+            ski.enemy_min_time = hc.at(0).toInt();
+            ski.enemy_max_time = hc.at(1).toInt();
         }
 
-        ski.enemy_adp = pl.at(23).toInt();
-        ski.enemy_ddp = pl.at(24).toInt();
-        ski.enemy_app = pl.at(25).toInt();
-        ski.enemy_dpp = pl.at(26).toInt();
-        ski.enemy_speedp = pl.at(27).toInt();
+        ski.enemy_adp = pl.at(++j).toInt();
+        ski.enemy_ddp = pl.at(++j).toInt();
+        ski.enemy_app = pl.at(++j).toInt();
+        ski.enemy_dpp = pl.at(++j).toInt();
+        ski.enemy_speedp = pl.at(++j).toInt();
 
-        ski.qianghuafirst = pl.at(28).toInt()?1:0;
+        ski.qianghuafirst = pl.at(++j).toInt()?1:0;
 
-        ski.self_cond = pl.at(29);
-        ski.enemy_cond = pl.at(30);
-        ski.prob2_self = pl.at(31).toDouble();
+        ski.self_cond = pl.at(++j);
+        ski.enemy_cond = pl.at(++j);
+        ski.prob2_self = pl.at(++j).toDouble();
 
 
 
@@ -296,8 +300,13 @@ SelectPet::SelectPet(QWidget *parent) :
          pokes_have_skills.push_back(id);
          for (int j = 2; j < pl.count(); ++j)
          {
+             if (pl.at(j).count() == 0)
+                 continue;
+
              QStringList huihe = pl.at(j).split(".");
              QPair<int,int> qp;
+
+
 
              if (huihe.count() == 2)
              {

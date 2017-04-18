@@ -45,6 +45,9 @@ private:
     void updatepok1();
     void updatepok2();
 
+    void updateStatus();
+    QString getStatus(Team & team);
+
     void skill_clicked(int i);
     int calcSpeed(Team & team, int n);
 

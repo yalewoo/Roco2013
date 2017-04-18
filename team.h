@@ -55,11 +55,27 @@ public:
 
 
     AttackData attack(int skill, Team & enemy, AttackData res = 0);
+    void consume(Team &team);
+
+
+    AttackData skill1(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill2(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill3(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill4(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill5(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill6(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill7(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill8(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill9(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill10(Pok &pok, Skill & sk, Team & enemy);
 
     int sleep = 0;
     int bingdong = 0;
+
     //可以行动返回true
     bool selfStatus();
+
+    void logofKezhi(double res);//显示属性克制信息
 
 };
 

@@ -15,10 +15,12 @@ public:
 
     int attack_type; //0变化 1物攻 2魔攻
     double power;  //威力
+    int damage_hard_cap = 0;
+    double damage_percent = 0;
     double prob;    //成功率 >1所有情况必中 =1对方无闪避必中
     int speed = 0;  //先手
     bool special = false;
-    double fandan;  //反弹伤害
+    double fandan = 0;  //反弹伤害
 
 
 
@@ -38,11 +40,14 @@ public:
     int self_speedp = 0;
 
     QString self_status;
-    int min_time;
-    int max_time;
-    double value;
+    int self_min_time;
+    int self_max_time;
+    double self_value;
 
     QString enemy_status;
+    int enemy_min_time;
+    int enemy_max_time;
+    double enemy_value;
 
 
 
