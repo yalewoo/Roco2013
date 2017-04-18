@@ -65,18 +65,22 @@ void Team::logofKezhi(double res)
         log("被双重抵抗了");
 
 }
+AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0)
+{
+
+}
 
 AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 {
     AttackData res;
 
 
-    if (skill_id >= 10)
+    if (skill_id >= 100 && skill_id <= 200)
     {
         //换宠物
         int new_id = skill_id % 10;
         current_pok = new_id;
-        log("【" + name + "】换上了【" + this->poks[new_id].pokemon.name);
+        log("【" + name + "】换上了【" + this->poks[new_id].pokemon.name + "】");
     }
     else
     {
@@ -107,15 +111,16 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
         }
         else if (t1 == 3)
         {
-            res = skill3(pok, sk, enemy);
+            res = skill3(skill_id, pok, sk, enemy);
 
         }
         else if (t1 == 4)
         {
-
-        }else if (t1 == 5)
+            res = skill4(pok, sk, enemy);
+        }
+        else if (t1 == 5)
         {
-
+            res = skill5(pok, sk, enemy);
         }
         else if (t1 == 6)
         {
@@ -144,6 +149,11 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
     {
         enemy.poks[enemy.current_pok].hp = 0;
         log("【" +enemy.name + "】的【" + enemy.poks[enemy.current_pok].pokemon.name + "】被击败了！");
+    }
+    if (poks[current_pok].hp <= 0)
+    {
+        poks[current_pok].hp = 0;
+        log("【" + name + "】的【" + poks[current_pok].pokemon.name + "】被击败了！");
     }
     res.hp_release = enemy_hp;
 
@@ -294,7 +304,7 @@ AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy)
     }
     return res;
 }
-AttackData Team::skill3(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy)
 {
 
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
@@ -340,6 +350,21 @@ AttackData Team::skill3(Pok &pok, Skill & sk, Team & enemy)
         {
             pok.wudun = huihe;
         }
+        else if (sk.self_status == "继续使用")
+        {
+            if (should_use)
+            {
+                --should_use_huihe;
+                if (should_use_huihe == 0)
+                    should_use = false;
+            }
+            else
+            {
+                should_use = true;
+                should_use_huihe = huihe;
+                should_use_id = skill_id;
+            }
+        }
     }
     else
     {
@@ -354,6 +379,68 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy)
 
     if (ifProb(sk.prob))
     {
+        int huihe;
+        if (sk.self_max_time == sk.self_min_time)
+            huihe = sk.self_max_time;
+        else
+        {
+            huihe = qrand() % (sk.self_max_time - sk.self_min_time) + sk.self_min_time;
+        }
+        qDebug() << "回合数：" << huihe << endl;
+
+        if (enemy_pok.shouhuzhili > 0)
+        {
+            log("受到【守护之力】的化解！");
+            return res;
+        }
+
+
+        if (sk.enemy_status == "睡眠")
+        {
+            if (enemy_pok.qingxing > 0)
+            {
+                log("受到【清醒】的化解！");
+                return res;
+            }
+            if (enemy.sleep == 0)
+            {
+                enemy.sleep = huihe;
+                res.cuimian = true;
+                log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】睡着了！");
+            }
+            if (sk.name == "生命火焰")
+            {
+                pok.hp = 0;
+            }
+
+        }
+        else if (sk.enemy_status == "冰冻")
+        {
+            enemy.bingdong = huihe;
+            res.bingdong = true;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】被冰冻了！");
+        }
+        else if (sk.enemy_status == "寄生")
+        {
+            enemy_pok.jisheng = 8;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】被寄生了！");
+        }
+        else if (sk.enemy_status == "中毒")
+        {
+            enemy_pok.zhongdu = true;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】中毒了！");
+        }
+        else if (sk.enemy_status == "烧伤")
+        {
+            enemy_pok.shaoshang = true;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】被烧伤了！");
+        }
+        else if (sk.enemy_status == "麻醉")
+        {
+            enemy_pok.mazui = true;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】被麻醉了！");
+        }
+
 
     }
     else
@@ -369,7 +456,31 @@ AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy)
 
     if (ifProb(sk.prob))
     {
-
+        if (sk.enemy_adp != 0)
+        {
+            enemy_pok.ad_rank += sk.enemy_adp;
+            log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】的【攻击】降低了【" + QString::number(sk.enemy_adp) + "】级");
+        }
+        if (sk.enemy_ddp != 0)
+        {
+            enemy_pok.dd_rank += sk.enemy_ddp;
+            log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】的【物抗】降低了【" + QString::number(sk.enemy_ddp) + "】级");
+        }
+        if (sk.enemy_app != 0)
+        {
+            enemy_pok.ap_rank += sk.enemy_app;
+            log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】的【魔攻】降低了【" + QString::number(sk.enemy_app) + "】级");
+        }
+        if (sk.enemy_dpp != 0)
+        {
+            enemy_pok.dp_rank += sk.enemy_dpp;
+            log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】的【魔抗】降低了【" + QString::number(sk.enemy_dpp) + "】级");
+        }
+        if (sk.enemy_speedp != 0)
+        {
+            enemy_pok.speed_rank += sk.enemy_speedp;
+            log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】的【速度】降低了【" + QString::number(sk.enemy_speedp) + "】级");
+        }
     }
     else
     {
@@ -469,13 +580,13 @@ void Team::init(QVector<Pokemon> *ppokes)
 
 bool Team::selfStatus()
 {
-    bool res;
+    bool res = true;
     if (sleep > 0)
     {
+        res = false;
         if (sleep == 1)
         {
             sleep = 0;
-            res = true;
         }
         else
         {
@@ -483,32 +594,30 @@ bool Team::selfStatus()
             if (r == 1)
             {
                 sleep = 0;
-                res = true;
             }
             else
             {
                 --sleep;
-                res = false;
             }
         }
-        if (res)
+        //qDebug() <<"sleep = " << sleep;
+
+        if (sleep == 0)
         {
             log("【" +name + "】的【" + poks[current_pok].pokemon.name + "】醒来了！");
-            return true;
         }
         else
         {
             log("【" +name + "】的【" + poks[current_pok].pokemon.name + "】睡着了！");
-            return false;
         }
 
     }
     else if (bingdong > 0)
     {
+        res = false;
         if (bingdong == 1)
         {
             bingdong = 0;
-            res = true;
         }
         else
         {
@@ -516,28 +625,24 @@ bool Team::selfStatus()
             if (r == 1)
             {
                 bingdong = 0;
-                res = true;
             }
             else
             {
                 --bingdong;
-                res = false;
             }
         }
-        if (res)
+        if (bingdong == 0)
         {
             log("【" +name + "】的【" + poks[current_pok].pokemon.name + "】醒来了！");
-            return true;
         }
         else
         {
             log("【" +name + "】的【" + poks[current_pok].pokemon.name + "】被冰冻了！");
-            return false;
         }
     }
 
 
-    return true;
+    return res;
 
 
 }

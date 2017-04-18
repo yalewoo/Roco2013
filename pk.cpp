@@ -157,8 +157,13 @@ void Pk::updateSkills(Team & team)
         int current_pp = pokes[team.current_pok].pp[row];
         tmp.sprintf("(%d/%d)\n",current_pp, sk.pp);
 
-        if (current_pp == 0)
+
+        if (pokes[team.current_pok].hp == 0 || current_pp == 0)
             qpb[row]->setEnabled(false);
+        else
+            qpb[row]->setEnabled(true);
+
+
 
         text += tmp;
 
@@ -247,7 +252,25 @@ void Pk::updatepok2()
 void Pk::skill_clicked(int i)
 {
     choose1 = i;
-    choose2 = computer_ai();
+    choose2 = computer_ai(team2);
+
+    if (dead1 || dead2)
+    {
+        if (dead1)
+        {
+            dead1 = false;
+            team1.attack(choose1, team2);
+        }
+        if (dead2)
+        {
+            dead2 = false;
+            team2.attack(choose2, team1);
+        }
+
+        display();
+        return;
+    }
+
 
     int speed1 = calcSpeed(team1, choose1);
     int speed2 = calcSpeed(team2, choose2);
@@ -265,21 +288,31 @@ void Pk::skill_clicked(int i)
     //qDebug() <<speed1 << " " << speed2<<endl;
 
     log("回合" + QString::number(huihe) + ":");
+    AttackData res;
     if (speed1 > speed2)
     {
         if (team1.selfStatus())
         {
-            AttackData res = team1.attack(choose1, team2);
+            res = team1.attack(choose1, team2);
             team1.consume(team2);
-            if (res.hp_release > 0 && !res.cuimian && !res.bingdong)
+
+            if (team2.poks[team2.current_pok].hp > 0 && !res.cuimian && !res.bingdong)
             {
                 if (team2.selfStatus())
                 {
                     team2.attack(choose2, team1);
+                    team2.consume(team1);
                 }
             }
 
-
+        }
+        else
+        {
+            if (team2.selfStatus())
+            {
+                team2.attack(choose2, team1);
+                team2.consume(team1);
+            }
         }
 
     }
@@ -287,11 +320,38 @@ void Pk::skill_clicked(int i)
     {
         if (team2.selfStatus())
         {
-            AttackData res = team2.attack(choose2, team1);
-            if (res.hp_release > 0 && !res.cuimian && !res.bingdong)
+            res = team2.attack(choose2, team1);
+            team2.consume(team1);
+
+            if (team1.poks[team1.current_pok].hp > 0 && !res.cuimian && !res.bingdong)
+            {
+                if (team1.selfStatus())
+                {
+                    team1.attack(choose1, team2);
+                    team1.consume(team2);
+                }
+            }
+
+        }
+        else
+        {
+            if (team1.selfStatus())
+            {
                 team1.attack(choose1, team2);
+                team1.consume(team2);
+            }
         }
     }
+
+    if (team2.poks.at(team2.current_pok).hp <= 0)
+    {
+        dead2 = true;
+    }
+    if (team1.poks.at(team1.current_pok).hp <= 0)
+    {
+        dead1 = true;
+    }
+
     ++huihe;
 
     display();
@@ -312,7 +372,7 @@ int Pk::calcSpeed(Team & team, int n)
         speed = speed / ((-1.0 * rank) * 0.5 + 1);
     }
 
-    if (n >= 10)
+    if (n >= 100)
     {
         //换宠物
 
@@ -355,10 +415,28 @@ void Pk::on_pushButton_clicked()
     int row = ui->poks->currentRow();
     if (row < 0 || row >= 6)
         return;
-    skill_clicked(10+row);
+    skill_clicked(100+row);
 }
 
-int Pk::computer_ai()
+int Pk::computer_ai(Team & team)
 {
-    return qrand() % 4;
+    Pok & pok = team.poks[team.current_pok];
+
+    if (pok.hp != 0)
+        return qrand() % 4;
+    else
+    {
+        QVector<int> can;
+        int count = 0;
+        for (int i = 0; i < team.poks.size(); ++i)
+        {
+            if (team.poks.at(i).hp > 0)
+            {
+                can.push_back(i);
+            }
+        }
+        int r = qrand() % can.size();
+
+        return can[r] + 100;
+    }
 }

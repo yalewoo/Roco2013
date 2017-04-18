@@ -22,6 +22,10 @@ struct AttackData {
     }
 };
 
+struct LastHuihe{
+
+};
+
 class Team  : public QWidget
 {
     Q_OBJECT
@@ -42,6 +46,8 @@ public:
     QVector<QPair<int,int> > *poke_skills;
 
     int current_pok;    //目前上场宠物
+
+
     QVector<Pok> poks; //6只宠物
     void init(QVector<Pokemon> *ppokes);
 
@@ -53,14 +59,14 @@ public:
     void attack3(Team & enemy) { attack(3, enemy); }
     void attack4(Team & enemy) { attack(4, enemy); }
 
-
     AttackData attack(int skill, Team & enemy, AttackData res = 0);
+    AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0);
     void consume(Team &team);
 
 
     AttackData skill1(Pok &pok, Skill & sk, Team & enemy);
     AttackData skill2(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill3(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy);
     AttackData skill4(Pok &pok, Skill & sk, Team & enemy);
     AttackData skill5(Pok &pok, Skill & sk, Team & enemy);
     AttackData skill6(Pok &pok, Skill & sk, Team & enemy);
@@ -71,6 +77,13 @@ public:
 
     int sleep = 0;
     int bingdong = 0;
+
+
+
+
+    bool should_use = false;
+    int should_use_id;
+    int should_use_huihe;
 
     //可以行动返回true
     bool selfStatus();

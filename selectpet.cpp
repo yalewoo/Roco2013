@@ -231,7 +231,7 @@ SelectPet::SelectPet(QWidget *parent) :
 
         ski.self_status = pl.at(++j);
 
-        QStringList huihe = pl.at(++j).split("-");
+        QStringList huihe = pl.at(++j).split("+");
         if (huihe.count() == 1)
         {
             ski.self_min_time = huihe.at(0).toInt();
@@ -248,7 +248,7 @@ SelectPet::SelectPet(QWidget *parent) :
 
         ski.enemy_status = pl.at(++j);
 
-        QStringList hc = pl.at(++j).split("-");
+        QStringList hc = pl.at(++j).split("+");
         if (hc.count() == 1)
         {
             ski.enemy_min_time = hc.at(0).toInt();

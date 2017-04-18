@@ -35,9 +35,12 @@ private:
 
     void display();
 
-    int computer_ai();  //敌方ai
+    int computer_ai(Team & team);  //敌方ai
 
     int huihe = 1;  //回合数
+
+    bool dead1 = false;
+    bool dead2 = false;
 
     void updatepoks_all(Team & team);
     void updateSkills(Team & team);

@@ -30,8 +30,11 @@ public:
     int pp[4] = {0};    //各个技能的可用PP
 
     int jisheng = 0;
-    int zhongdu = 0;
-    int judu = 0;
+
+    bool zhongdu = false;
+    bool judu = false;
+    bool shaoshang = false;
+    bool mazui = false;
 
     int qingxing = 0;
     int shouhuzhili = 0;
