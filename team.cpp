@@ -72,7 +72,7 @@ AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0)
 
 AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 {
-    AttackData res;
+    res.clear();
 
 
     if (skill_id >= 100 && skill_id <= 200)
@@ -105,46 +105,46 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 
         if (t1 == 1)
         {
-            res = skill1(pok, sk, enemy, last);
+            skill1(pok, sk, enemy, last);
 
         }
         else if (t1 == 2)
         {
-            res = skill2(pok, sk, enemy, last);
+            skill2(pok, sk, enemy, last);
 
         }
         else if (t1 == 3)
         {
-            res = skill3(skill_id, pok, sk, enemy, last);
+            skill3(skill_id, pok, sk, enemy, last);
 
         }
         else if (t1 == 4)
         {
-            res = skill4(pok, sk, enemy, last);
+            skill4(pok, sk, enemy, last);
         }
         else if (t1 == 5)
         {
-            res = skill5(pok, sk, enemy, last);
+            skill5(pok, sk, enemy, last);
         }
         else if (t1 == 6)
         {
-            res = skill6(skill_id, pok, sk, enemy, last);
+            skill6(skill_id, pok, sk, enemy, last);
         }
         else if (t1 == 7)
         {
-            res = skill7(pok, sk, enemy, last);
+            skill7(pok, sk, enemy, last);
         }
         else if (t1 == 8)
         {
-            res = skill8(pok, sk, enemy, last);
+            skill8(pok, sk, enemy, last);
         }
         else if (t1 == 9)
         {
-            res = skill9(pok, sk, enemy, last);
+            skill9(pok, sk, enemy, last);
         }
         else
         {
-            res = skill10(pok, sk, enemy, last);
+            skill10(pok, sk, enemy, last);
         }
     }
 
@@ -168,7 +168,7 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 }
 
 
-AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
 
@@ -191,18 +191,19 @@ AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         {1.0,1.0,2.0,2.0,0.5,1.0,1.0,1.0,1.0,1.0,0.5,1.0,1.0,2.0,0.5,1.0,1.0},
         {1.0,1.0,1.0,1.0,1.0,1.0,0.5,1.0,1.0,2.0,1.0,1.0,1.0,1.0,0.5,1.0,2.0}};
 
-    AttackData res;
+
 
     if (ifProb(sk.prob) && !xianshou.kongju || sk.prob > 1.8)
     {
         double power = sk.power;
 
         //伤害＝{ [（攻方宠物等级×0.4＋2）×攻击技能威力×攻方的攻击（魔攻）/守方的防御（魔防）/50＋2]（下舍入）×相克修正×（80%到100%之间随机数）}（下舍入）
-        int damage;
+        int damage = 0;
 
         if (sk.attack_type == 0)
         {
-
+            damage += sk.damage_hard_cap;
+            damage += sk.damage_percent * enemy_pok.hp_max;
         }
         else
         {
@@ -261,6 +262,12 @@ AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         }
         res.damage = damage;
 
+        if (enemy.sleep > 0 && sk.power > 1)
+        {
+            enemy.sleep = 0;
+            log("【" +enemy.name + "】的【" + enemy.poks[enemy.current_pok].pokemon.name + "】醒来了！");
+        }
+
     }
     else
     {
@@ -269,12 +276,12 @@ AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         res.damage = 0;
     }
 
-    return res;
+    return;
 }
-AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
+
 
     if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
@@ -309,13 +316,13 @@ AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         log("可惜miss了！");
         res.miss = true;
     }
-    return res;
+    return;
 }
-AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
 
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
+
 
     if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
@@ -378,12 +385,12 @@ AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, Attack
         log("可惜miss了！");
         res.miss = true;
     }
-    return res;
+    return;
 }
-AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
+
 
     if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
@@ -399,7 +406,7 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         if (enemy_pok.shouhuzhili > 0)
         {
             log("受到【守护之力】的化解！");
-            return res;
+            return;
         }
 
 
@@ -408,7 +415,7 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
             if (enemy_pok.qingxing > 0)
             {
                 log("受到【清醒】的化解！");
-                return res;
+                return;
             }
             if (enemy.sleep == 0)
             {
@@ -438,6 +445,11 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
             enemy_pok.zhongdu = true;
             log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】中毒了！");
         }
+        else if (sk.enemy_status == "中毒")
+        {
+            enemy_pok.judu = 1;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】中剧毒了！");
+        }
         else if (sk.enemy_status == "烧伤")
         {
             enemy_pok.shaoshang = true;
@@ -458,15 +470,15 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
     }
     else
     {
-        log("可惜miss了！");
+        log("可惜" + sk.enemy_status + "效果miss了！");
         res.miss = true;
     }
-    return res;
+    return;
 }
-AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
+
 
     if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
@@ -501,50 +513,41 @@ AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         log("可惜miss了！");
         res.miss = true;
     }
-    return res;
-}AttackData Team::skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+    return;
+}void Team::skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
 
-    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
-    {
-        skill1(pok, sk, enemy, xianshou);
+
+
+    skill1(pok, sk, enemy, xianshou);
+    if (!res.miss)
         skill3(skill_id, pok, sk, enemy, xianshou);
-    }
-    else
-    {
-        log("可惜miss了！");
-        res.miss = true;
-    }
-    return res;
+
+
+    return;
 }
-AttackData Team::skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
 
-    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
-    {
-        res = skill1(pok, sk, enemy, xianshou);
+
+
+        skill1(pok, sk, enemy, xianshou);
         Skill sk2 = sk;
         sk2.prob = sk.prob2;
         if (!res.miss)
         {
             skill4(pok, sk2, enemy, xianshou);
         }
-    }
-    else
-    {
-        log("可惜miss了！");
-        res.miss = true;
-    }
-    return res;
+
+
+    return;
 }
-AttackData Team::skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
+
 
     if (sk.qianghuafirst)
     {
@@ -553,57 +556,51 @@ AttackData Team::skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xiansho
         skill2(pok, sk2, enemy, xianshou);
     }
 
-    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
-    {
+
         skill1(pok, sk, enemy, xianshou);
-    }
-    else
-    {
-        log("可惜miss了！");
-        res.miss = true;
-    }
-    return res;
+        if (!res.miss)
+        {
+            Skill sk2 = sk;
+            sk2.prob = sk.prob2_self;
+            skill2(pok, sk2, enemy, xianshou);
+        }
+
+
+
+
+    return;
 }
-AttackData Team::skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
 
-    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
-    {
+
+
         skill1(pok, sk, enemy, xianshou);
+        if (!res.miss)
+        {
+            Skill sk2 = sk;
+            sk2.prob = sk.prob2;
+            skill5(pok, sk2, enemy, xianshou);
+        }
 
-        Skill sk2 = sk;
-        sk2.prob = sk.prob2;
-        skill5(pok, sk2, enemy, xianshou);
-    }
-    else
-    {
-        log("可惜miss了！");
-        res.miss = true;
-    }
-    return res;
+
+
+    return;
 }
-AttackData Team::skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+void Team::skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
 
-    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
-    {
 
-    }
-    else
-    {
-        log("可惜miss了！");
-        res.miss = true;
-    }
-    return res;
+    return;
 }
 
 
 void Team::init(QVector<Pokemon> *ppokes)
 {
+    poks.clear();
+
     QVector<Pokemon> &pokes = *ppokes;
 
     for (int i = 0; i < pokes.size(); ++i)
@@ -687,10 +684,62 @@ bool Team::selfStatus()
 
 void Team::consume(Team &team, AttackData & res)
 {
+    Team &enemy = team;
+    static QString idtoPri[17] = {"普","冰","草","虫","电","毒","恶","火","龙","萌","石","水","土","武","械","翼","幽"};
     Pok & pok = poks[current_pok];
     if (pok.dadikuanshu > 0)
     {
         --pok.dadikuanshu;
         res.kongju = true;
     }
+
+    Pok & enemy_pok = team.poks[team.current_pok];
+
+    if (pok.bingtianxuedi > 0)
+    {
+        --pok.bingtianxuedi;
+        int damage = enemy_pok.hp_max / 6 * getrand80100();
+        enemy_pok.hp -= damage;
+
+
+        log("【" + name + "】的【" + pok.pokemon.name + "】的冰天雪地生效了！");
+        if (idtoPri[enemy_pok.pokemon.attr] == "冰" || enemy_pok.pokemon.attr2 != -1 && idtoPri[enemy_pok.pokemon.attr2] == "冰")
+        {
+            log("冰天雪地miss了!");
+        }
+        else
+        {
+            log("对【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】造成了" + QString::number(damage) + "点伤害");
+        }
+    }
+    if (enemy_pok.jisheng > 0)
+    {
+        --enemy_pok.jisheng;
+        int damage = enemy_pok.hp_max / 8;
+        enemy_pok.hp -= damage;
+        pok.hp += damage;
+        if (pok.hp > pok.hp_max)
+            pok.hp = pok.hp_max;
+
+        log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】被寄生造成伤害【" + QString::number(damage) +"】点");
+    }
+    if (enemy_pok.zhongdu)
+    {
+        int damage = enemy_pok.hp_max / 8;
+        enemy_pok.hp -= damage;
+
+        log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】中毒造成伤害【" + QString::number(damage) +"】点");
+    }
+    if (enemy_pok.judu)
+    {
+        int damage = enemy_pok.hp_max / 8;
+        damage *= enemy_pok.judu;
+        enemy_pok.judu++;
+        enemy_pok.hp -= damage;
+
+        log("【" + enemy.name + "】的【" + enemy_pok.pokemon.name + "】剧毒造成伤害【" + QString::number(damage) +"】点");
+    }
+
+    if (enemy_pok.hp < 0)
+        enemy_pok.hp = 0;
 }

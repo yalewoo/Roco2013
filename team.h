@@ -21,6 +21,18 @@ struct AttackData {
         damage = 0;
         cuimian = false;
         bingdong = false;
+        miss = false;
+        kongju = false;
+    }
+
+    void clear()
+    {
+        hp_release = 0;
+        damage = 0;
+        cuimian = false;
+        bingdong = false;
+        miss = false;
+        kongju = false;
     }
 };
 
@@ -54,6 +66,7 @@ public:
     void init(QVector<Pokemon> *ppokes);
 
 
+    AttackData res;
 
 
     void attack1(Team & enemy) { attack(1, enemy); }
@@ -66,16 +79,16 @@ public:
     void consume(Team &team, AttackData & res);
 
 
-    AttackData skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
-    AttackData skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    void skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
 
     int sleep = 0;
     int bingdong = 0;

@@ -22,6 +22,8 @@ Pk::Pk(QWidget *parent) :
 
 
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 Pk::~Pk()
@@ -33,6 +35,12 @@ Pk::~Pk()
 
 void Pk::initTeam()
 {
+    logs.clear();
+    huihe = 1;
+
+    dead1 = false;
+    dead2 = false;
+
     team1.init(GlobalVar::pokes);
     team2.init(GlobalVar::pokes);
 
@@ -141,7 +149,7 @@ void Pk::updateSkills(Team & team)
 
     QPushButton * qpb[4] = {ui->skill1, ui->skill2, ui->skill3, ui->skill4};
 
-    for (int row = 0; row < 4; ++row)
+    for (int row = 0; row < pokes[team.current_pok].pokemon.skills.size(); ++row)
     {
         int t1 = pokes[team.current_pok].pokemon.skills[row].first;
         int t2 = pokes[team.current_pok].pokemon.skills[row].second;
@@ -203,12 +211,12 @@ void Pk::updatepok1()
         ui->attr2->setText("");
 
     //宠物图片
-//    QString file;
-//    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
-//    QMovie *movie = new QMovie(file);
-//    movie->setScaledSize(ui->poke_img->size());
-//    ui->poke_img->setMovie(movie);
-//    movie->start();
+    QString file;
+    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
+    QMovie *movie = new QMovie(file);
+    movie->setScaledSize(ui->poke_img->size());
+    ui->poke_img->setMovie(movie);
+    movie->start();
 
     QString text;
     text.sprintf("%d/%d", pok.hp, pok.hp_max);
@@ -234,12 +242,12 @@ void Pk::updatepok2()
         ui->attr2_2->setText("");
 
     //宠物图片
-//    QString file;
-//    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
-//    QMovie *movie = new QMovie(file);
-//    movie->setScaledSize(ui->poke_img_2->size());
-//    ui->poke_img_2->setMovie(movie);
-//    movie->start();
+    QString file;
+    file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
+    QMovie *movie = new QMovie(file);
+    movie->setScaledSize(ui->poke_img_2->size());
+    ui->poke_img_2->setMovie(movie);
+    movie->start();
 
     QString text;
     text.sprintf("%d/%d", pok.hp, pok.hp_max);
@@ -254,21 +262,13 @@ void Pk::skill_clicked(int i)
     choose1 = i;
     choose2 = computer_ai(team2);
 
-    if (dead1 || dead2)
+    if (dead1)
     {
-        if (dead1)
-        {
-            dead1 = false;
-            team1.attack(choose1, team2);
-        }
-        if (dead2)
-        {
-            dead2 = false;
-            team2.attack(choose2, team1);
-        }
+        dead1 = false;
+        team1.attack(choose1, team2);
+        ++huihe;
 
         display();
-        return;
     }
 
 
@@ -352,6 +352,20 @@ void Pk::skill_clicked(int i)
         dead1 = true;
     }
 
+
+    if (dead2)
+    {
+        choose2 = computer_ai(team2);
+        if (choose2 != 888888)
+        {
+            dead2 = false;
+            team2.attack(choose2, team1);
+        }
+
+    }
+
+
+
     ++huihe;
 
     display();
@@ -412,6 +426,8 @@ void Pk::on_skill4_clicked()
 //换宠物
 void Pk::on_pushButton_clicked()
 {
+    ui->tabWidget->setCurrentIndex(0);
+
     int row = ui->poks->currentRow();
     if (row < 0 || row >= 6)
         return;
@@ -423,7 +439,7 @@ int Pk::computer_ai(Team & team)
     Pok & pok = team.poks[team.current_pok];
 
     if (pok.hp != 0)
-        return qrand() % 4;
+        return qrand() % pok.pokemon.skills.size();
     else
     {
         QVector<int> can;
@@ -436,7 +452,12 @@ int Pk::computer_ai(Team & team)
             }
         }
         int r = qrand() % can.size();
-
-        return can[r] + 100;
+        if (can.size() > 0)
+            return can[r] + 100;
+        else
+        {
+            log("你胜利了！");
+            return 888888;
+        }
     }
 }

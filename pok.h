@@ -32,7 +32,7 @@ public:
     int jisheng = 0;
 
     bool zhongdu = false;
-    bool judu = false;
+    int judu = 0;
     bool shaoshang = false;
     bool mazui = false;
 

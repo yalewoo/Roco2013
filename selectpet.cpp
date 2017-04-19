@@ -566,6 +566,8 @@ Pokemon SelectPet::getPokemon(int id)
     Pokemon pok(id);
 
     pok.name = pokemons_all[id].name;
+    pok.attr = pokemons_all[id].attr;
+    pok.attr2 = pokemons_all[id].attr2;
 
 
     pok.hp = ui->hp->text().toInt();
