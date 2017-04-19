@@ -12,6 +12,8 @@ struct AttackData {
     int damage;
     bool cuimian;
     bool bingdong;
+    bool miss = false;
+    bool kongju = false;
 
     AttackData(int a = 0)
     {
@@ -61,19 +63,19 @@ public:
 
     AttackData attack(int skill, Team & enemy, AttackData res = 0);
     AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0);
-    void consume(Team &team);
+    void consume(Team &team, AttackData & res);
 
 
-    AttackData skill1(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill2(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill4(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill5(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill6(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill7(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill8(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill9(Pok &pok, Skill & sk, Team & enemy);
-    AttackData skill10(Pok &pok, Skill & sk, Team & enemy);
+    AttackData skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
+    AttackData skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou);
 
     int sleep = 0;
     int bingdong = 0;

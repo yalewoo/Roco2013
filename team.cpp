@@ -97,50 +97,54 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
         int t2 = pok.pokemon.skills[skill_id].second;
         Skill & sk = skills_all[t1][t2];
 
+
+
         log("【" + name + "】的【" + pok.pokemon.name + "】使用了" + sk.name);
+
+
 
         if (t1 == 1)
         {
-            res = skill1(pok, sk, enemy);
+            res = skill1(pok, sk, enemy, last);
 
         }
         else if (t1 == 2)
         {
-            res = skill2(pok, sk, enemy);
+            res = skill2(pok, sk, enemy, last);
 
         }
         else if (t1 == 3)
         {
-            res = skill3(skill_id, pok, sk, enemy);
+            res = skill3(skill_id, pok, sk, enemy, last);
 
         }
         else if (t1 == 4)
         {
-            res = skill4(pok, sk, enemy);
+            res = skill4(pok, sk, enemy, last);
         }
         else if (t1 == 5)
         {
-            res = skill5(pok, sk, enemy);
+            res = skill5(pok, sk, enemy, last);
         }
         else if (t1 == 6)
         {
-
+            res = skill6(skill_id, pok, sk, enemy, last);
         }
         else if (t1 == 7)
         {
-
+            res = skill7(pok, sk, enemy, last);
         }
         else if (t1 == 8)
         {
-
+            res = skill8(pok, sk, enemy, last);
         }
         else if (t1 == 9)
         {
-
+            res = skill9(pok, sk, enemy, last);
         }
         else
         {
-
+            res = skill10(pok, sk, enemy, last);
         }
     }
 
@@ -164,7 +168,7 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 }
 
 
-AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
 
@@ -188,7 +192,8 @@ AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy)
         {1.0,1.0,1.0,1.0,1.0,1.0,0.5,1.0,1.0,2.0,1.0,1.0,1.0,1.0,0.5,1.0,2.0}};
 
     AttackData res;
-    if (ifProb(sk.prob))
+
+    if (ifProb(sk.prob) && !xianshou.kongju || sk.prob > 1.8)
     {
         double power = sk.power;
 
@@ -260,17 +265,18 @@ AttackData Team::skill1(Pok &pok, Skill & sk, Team & enemy)
     else
     {
         log("可惜miss了！");
+        res.miss = true;
         res.damage = 0;
     }
 
     return res;
 }
-AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
         if (sk.self_adp > 0)
         {
@@ -301,16 +307,17 @@ AttackData Team::skill2(Pok &pok, Skill & sk, Team & enemy)
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
 
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
         int huihe;
         if (sk.self_max_time == sk.self_min_time)
@@ -369,15 +376,16 @@ AttackData Team::skill3(int skill_id, Pok &pok, Skill & sk, Team & enemy)
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
         int huihe;
         if (sk.self_max_time == sk.self_min_time)
@@ -440,21 +448,27 @@ AttackData Team::skill4(Pok &pok, Skill & sk, Team & enemy)
             enemy_pok.mazui = true;
             log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】被麻醉了！");
         }
+        else if (sk.enemy_status == "恐惧")
+        {
+            res.kongju = true;
+            log("【" +enemy.name + "】的【" + enemy_pok.pokemon.name + "】恐惧了！");
+        }
 
 
     }
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
         if (sk.enemy_adp != 0)
         {
@@ -485,80 +499,104 @@ AttackData Team::skill5(Pok &pok, Skill & sk, Team & enemy)
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
-}AttackData Team::skill6(Pok &pok, Skill & sk, Team & enemy)
+}AttackData Team::skill6(int skill_id, Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
-
+        skill1(pok, sk, enemy, xianshou);
+        skill3(skill_id, pok, sk, enemy, xianshou);
     }
     else
     {
         log("可惜miss了！");
-    }
-    return res;
-}
-AttackData Team::skill7(Pok &pok, Skill & sk, Team & enemy)
-{
-    Pok & enemy_pok = enemy.poks[enemy.current_pok];
-    AttackData res;
-
-    if (ifProb(sk.prob))
-    {
-
-    }
-    else
-    {
-        log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill8(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill7(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
-
+        res = skill1(pok, sk, enemy, xianshou);
+        Skill sk2 = sk;
+        sk2.prob = sk.prob2;
+        if (!res.miss)
+        {
+            skill4(pok, sk2, enemy, xianshou);
+        }
     }
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill9(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill8(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if (sk.qianghuafirst)
     {
+        Skill sk2 = sk;
+        sk2.prob = sk.prob2_self;
+        skill2(pok, sk2, enemy, xianshou);
+    }
 
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
+    {
+        skill1(pok, sk, enemy, xianshou);
     }
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
-AttackData Team::skill10(Pok &pok, Skill & sk, Team & enemy)
+AttackData Team::skill9(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
 {
     Pok & enemy_pok = enemy.poks[enemy.current_pok];
     AttackData res;
 
-    if (ifProb(sk.prob))
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
+    {
+        skill1(pok, sk, enemy, xianshou);
+
+        Skill sk2 = sk;
+        sk2.prob = sk.prob2;
+        skill5(pok, sk2, enemy, xianshou);
+    }
+    else
+    {
+        log("可惜miss了！");
+        res.miss = true;
+    }
+    return res;
+}
+AttackData Team::skill10(Pok &pok, Skill & sk, Team & enemy, AttackData & xianshou)
+{
+    Pok & enemy_pok = enemy.poks[enemy.current_pok];
+    AttackData res;
+
+    if ( sk.prob > 1.8 || !xianshou.kongju && ifProb(sk.prob))
     {
 
     }
     else
     {
         log("可惜miss了！");
+        res.miss = true;
     }
     return res;
 }
@@ -647,7 +685,12 @@ bool Team::selfStatus()
 
 }
 
-void Team::consume(Team &team)
+void Team::consume(Team &team, AttackData & res)
 {
-
+    Pok & pok = poks[current_pok];
+    if (pok.dadikuanshu > 0)
+    {
+        --pok.dadikuanshu;
+        res.kongju = true;
+    }
 }

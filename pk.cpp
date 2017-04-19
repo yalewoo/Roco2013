@@ -294,14 +294,14 @@ void Pk::skill_clicked(int i)
         if (team1.selfStatus())
         {
             res = team1.attack(choose1, team2);
-            team1.consume(team2);
+            team1.consume(team2, res);
 
             if (team2.poks[team2.current_pok].hp > 0 && !res.cuimian && !res.bingdong)
             {
                 if (team2.selfStatus())
                 {
-                    team2.attack(choose2, team1);
-                    team2.consume(team1);
+                    team2.attack(choose2, team1, res);
+                    team2.consume(team1, res);
                 }
             }
 
@@ -311,7 +311,7 @@ void Pk::skill_clicked(int i)
             if (team2.selfStatus())
             {
                 team2.attack(choose2, team1);
-                team2.consume(team1);
+                team2.consume(team1, res);
             }
         }
 
@@ -321,14 +321,14 @@ void Pk::skill_clicked(int i)
         if (team2.selfStatus())
         {
             res = team2.attack(choose2, team1);
-            team2.consume(team1);
+            team2.consume(team1, res);
 
             if (team1.poks[team1.current_pok].hp > 0 && !res.cuimian && !res.bingdong)
             {
                 if (team1.selfStatus())
                 {
-                    team1.attack(choose1, team2);
-                    team1.consume(team2);
+                    team1.attack(choose1, team2, res);
+                    team1.consume(team2, res);
                 }
             }
 
@@ -338,7 +338,7 @@ void Pk::skill_clicked(int i)
             if (team1.selfStatus())
             {
                 team1.attack(choose1, team2);
-                team1.consume(team2);
+                team1.consume(team2, res);
             }
         }
     }
