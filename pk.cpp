@@ -7,23 +7,31 @@
 #include <QTime>
 #include <QDebug>
 #include<QScrollBar>
+#include <QTcpSocket>
+
 
 Pk::Pk(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Pk), team1(parent), team2(parent)
+    ui(new Ui::Pk), team1(parent, logs), team2(parent, logs)
 {
     ui->setupUi(this);
 
     team1.name = "你";
     team2.name = "电脑";
 
-    connect(&team1, SIGNAL(addlog(QString)), this, SLOT(log(QString)));
-    connect(&team2, SIGNAL(addlog(QString)), this, SLOT(log(QString)));
+    team1.textedit_logs = ui->log;
+    team2.textedit_logs = ui->log;
+
+
+    connect(&team1, SIGNAL(updatePK()), this, SLOT(display()));
+    connect(&team2, SIGNAL(updatePK()), this, SLOT(display()));
 
 
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
     ui->tabWidget->setCurrentIndex(0);
+
+    connect(ui->log, SIGNAL(textChanged()), this, SLOT(update()));
 }
 
 Pk::~Pk()
@@ -52,6 +60,15 @@ void Pk::initTeam()
     log("【" + team2.name + "】召唤了【" + pokemons_all.at(team2.poks.at(0).pokemon.id).name + "】" );
 }
 
+void Pk::delay(int time)
+{
+    QTime _Timer = QTime::currentTime();
+    QTime _NowTimer;
+    do{
+        _NowTimer=QTime::currentTime();
+    }while (_Timer.msecsTo(_NowTimer)<=time);
+}
+
 void Pk::display()
 {
     updatepoks_all(team1);
@@ -69,9 +86,11 @@ void Pk::log(QString log)
 {
     logs += log + "\r\n";
     //qDebug() << "here:" << log;
+
     ui->log->setText(logs);
 
     ui->log->verticalScrollBar()->setValue(ui->log->verticalScrollBar()->maximum());
+
 }
 void Pk::updateStatus()
 {
@@ -259,6 +278,12 @@ void Pk::updatepok2()
 
 void Pk::skill_clicked(int i)
 {
+    ui->skill1->setEnabled(false);
+    ui->skill2->setEnabled(false);
+    ui->skill3->setEnabled(false);
+    ui->skill4->setEnabled(false);
+    display();
+
     choose1 = i;
     choose2 = computer_ai(team2);
 
@@ -369,6 +394,10 @@ void Pk::skill_clicked(int i)
     ++huihe;
 
     display();
+    ui->skill1->setEnabled(true);
+    ui->skill2->setEnabled(true);
+    ui->skill3->setEnabled(true);
+    ui->skill4->setEnabled(true);
 }
 int Pk::calcSpeed(Team & team, int n)
 {
@@ -436,28 +465,63 @@ void Pk::on_pushButton_clicked()
 
 int Pk::computer_ai(Team & team)
 {
-    Pok & pok = team.poks[team.current_pok];
-
-    if (pok.hp != 0)
-        return qrand() % pok.pokemon.skills.size();
-    else
+    bool use_computer = false;
+    if (use_computer)
     {
-        QVector<int> can;
-        int count = 0;
-        for (int i = 0; i < team.poks.size(); ++i)
-        {
-            if (team.poks.at(i).hp > 0)
-            {
-                can.push_back(i);
-            }
-        }
-        int r = qrand() % can.size();
-        if (can.size() > 0)
-            return can[r] + 100;
+        Pok & pok = team.poks[team.current_pok];
+
+        if (pok.hp != 0)
+            return qrand() % pok.pokemon.skills.size();
         else
         {
-            log("你胜利了！");
-            return 888888;
+            QVector<int> can;
+            int count = 0;
+            for (int i = 0; i < team.poks.size(); ++i)
+            {
+                if (team.poks.at(i).hp > 0)
+                {
+                    can.push_back(i);
+                }
+            }
+            int r = qrand() % can.size();
+            if (can.size() > 0)
+                return can[r] + 100;
+            else
+            {
+                log("你胜利了！");
+                return 888888;
+            }
         }
     }
+    else
+    {
+        Pok & pok = team.poks[team.current_pok];
+        QString send;
+        if (pok.hp != 0)
+        {
+             send = "skill";
+        }
+        else
+        {
+             send = "change";
+        }
+
+
+        client->socket->write(send.toLatin1());
+        client->socket->flush();
+
+        QByteArray buffer;
+        client->socket->waitForReadyRead();
+        buffer = client->socket->readAll();
+        QString str;
+        if (!buffer.isEmpty())
+        {
+            str = buffer;
+        }
+
+        qDebug() << "socket receive : " << str;
+
+        return str.toInt();
+    }
+
 }

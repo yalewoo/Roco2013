@@ -1,0 +1,15 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\pokemon.o
+./release\skill.o
+./release\selectpet.o
+./release\pk.o
+./release\pok.o
+./release\team.o
+./release\globalvar.o
+./release\moc_mainwindow.o
+./release\moc_selectpet.o
+./release\moc_pk.o
+./release\moc_team.o
+);

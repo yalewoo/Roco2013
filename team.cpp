@@ -3,6 +3,13 @@
 #include <QTime>
 #include <QtGlobal>
 #include <QDebug>
+
+#include <QTextEdit>
+#include<QScrollBar>
+
+#include <QEventLoop>
+#include <QCoreApplication>
+
 bool ifProb(double p)
 {
 
@@ -26,7 +33,7 @@ double getrand80100()
 
 }
 
-Team::Team(QWidget *parent)  :  QWidget(parent)
+Team::Team(QWidget *parent, QString &log)  :  QWidget(parent), logs(log)
 {
     poke_skills = GlobalVar::poke_skills;
 }
@@ -37,7 +44,17 @@ Team::~Team()
 
 void Team::log(QString log)
 {
-    emit addlog(log);
+    //QString logs = textedit_logs->toPlainText();
+    logs += log + "\r\n";
+    //qDebug() << "here:" << log;
+
+    textedit_logs->setText(logs);
+
+    textedit_logs->verticalScrollBar()->setValue(textedit_logs->verticalScrollBar()->maximum());
+
+    emit updatePK();
+
+    delay(1000);
 }
 
 int calc(int ad, int rank)
@@ -65,6 +82,13 @@ void Team::logofKezhi(double res)
         log("被双重抵抗了");
 
 }
+
+void Team::delay(int msec)
+{
+    QTime dieTime = QTime::currentTime().addMSecs(msec);
+    while( QTime::currentTime() <dieTime )
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
 AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0)
 {
 
@@ -72,6 +96,7 @@ AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0)
 
 AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 {
+
     res.clear();
 
 
@@ -160,6 +185,8 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
         log("【" + name + "】的【" + poks[current_pok].pokemon.name + "】被击败了！");
     }
     res.hp_release = enemy_hp;
+
+
 
     return res;
 
@@ -615,6 +642,8 @@ void Team::init(QVector<Pokemon> *ppokes)
 
 bool Team::selfStatus()
 {
+
+
     bool res = true;
     if (sleep > 0)
     {
@@ -684,6 +713,8 @@ bool Team::selfStatus()
 
 void Team::consume(Team &team, AttackData & res)
 {
+
+
     Team &enemy = team;
     static QString idtoPri[17] = {"普","冰","草","虫","电","毒","恶","火","龙","萌","石","水","土","武","械","翼","幽"};
     Pok & pok = poks[current_pok];

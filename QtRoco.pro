@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     pk.cpp \
     pok.cpp \
     team.cpp \
-    globalvar.cpp
+    globalvar.cpp \
+    client.cpp
 
 HEADERS  += mainwindow.h \
     pokemon.h \
@@ -29,8 +30,10 @@ HEADERS  += mainwindow.h \
     pk.h \
     pok.h \
     team.h \
-    globalvar.h
+    globalvar.h \
+    client.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
     selectpet.ui \
-    pk.ui
+    pk.ui \
+    client.ui

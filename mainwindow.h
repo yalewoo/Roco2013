@@ -5,9 +5,10 @@
 
 #include "pokemon.h"
 
-namespace Ui {
-class MainWindow;
-}
+class QTabWidget;
+class Pk;
+class SelectPet;
+class Client;
 
 class MainWindow : public QMainWindow
 {
@@ -22,9 +23,10 @@ private slots:
 
 
 private:
-    Ui::MainWindow *ui;
-
-
+    QTabWidget * tabWidget;
+    Pk *pk;
+    SelectPet * selectPet;
+    Client * client;
 
 
 };

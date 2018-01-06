@@ -484,10 +484,10 @@ void SelectPet::updatedata()
     //宠物图片
     QString file;
     file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
-//    QMovie *movie = new QMovie(file);
-//    movie->setScaledSize(ui->poke_img->size());
-//    ui->poke_img->setMovie(movie);
-//    movie->start();
+    QMovie *movie = new QMovie(file);
+    movie->setScaledSize(ui->poke_img->size());
+    ui->poke_img->setMovie(movie);
+    movie->start();
 
     //显示性格
     int t1, t2;

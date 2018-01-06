@@ -1,0 +1,15 @@
+INPUT(
+./debug\main.o
+./debug\mainwindow.o
+./debug\pokemon.o
+./debug\skill.o
+./debug\selectpet.o
+./debug\pk.o
+./debug\pok.o
+./debug\team.o
+./debug\globalvar.o
+./debug\moc_mainwindow.o
+./debug\moc_selectpet.o
+./debug\moc_pk.o
+./debug\moc_team.o
+);

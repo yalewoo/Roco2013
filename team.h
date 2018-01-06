@@ -7,6 +7,8 @@
 
 #include <QWidget>
 
+class QTextEdit;
+
 struct AttackData {
     int hp_release;
     int damage;
@@ -50,10 +52,13 @@ public:
 
 
 signals:
-    void addlog(QString log);
+    void updatePK();
 
 public:
+    Team(QWidget *parent, QString &log);
     void log(QString log);
+    QTextEdit * textedit_logs;
+    QString & logs;
 
     QString name;   //队伍名字
 
@@ -105,6 +110,7 @@ public:
 
     void logofKezhi(double res);//显示属性克制信息
 
+    void delay(int time);
 };
 
 #endif // TEAM_H

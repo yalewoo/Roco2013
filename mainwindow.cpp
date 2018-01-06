@@ -1,29 +1,48 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QTabWidget>
+#include "pk.h"
+#include "selectpet.h"
+#include "client.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
+    tabWidget = new QTabWidget(this);
 
-    ui->tabWidget->setCurrentIndex(0);
+    client = new Client(this);
+    tabWidget->addTab(client, "在线");
 
-    connect(ui->selectPet, SIGNAL(startGame()), this, SLOT(startGame()));
+    selectPet = new SelectPet(this);
+    tabWidget->addTab(selectPet, "选择宠物");
+
+    pk = new Pk(this);
+    tabWidget->addTab(pk, "对战");
+
+
+
+    pk->client = client;
+
+    this->setCentralWidget(tabWidget);
+    this->resize(1055,740);
+
+    connect(selectPet, SIGNAL(startGame()), this, SLOT(startGame()));
+
+    tabWidget->setCurrentIndex(0);
 
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+
 }
 
 void MainWindow::startGame()
 {
-    ui->tabWidget->setCurrentIndex(1);
+    tabWidget->setCurrentIndex(2);
 
-    ui->pk->initTeam();
+    pk->initTeam();
 }
 

@@ -5,6 +5,8 @@
 #include <QString>
 #include "team.h"
 
+#include "client.h"
+
 namespace Ui {
 class Pk;
 }
@@ -19,11 +21,17 @@ public:
 
     void initTeam();
 
+    void delay(int time);
+
+        Client * client;
+
 private:
     Ui::Pk *ui;
 
 
     QString logs;
+
+
 
 
     Team team1; //我方队伍
@@ -33,7 +41,7 @@ private:
     int choose1;    //我方选择
     int choose2;    //敌方选择
 
-    void display();
+
 
     int computer_ai(Team & team);  //敌方ai
 
@@ -61,6 +69,8 @@ private slots:
     void on_skill3_clicked();
     void on_skill4_clicked();
     void on_pushButton_clicked();
+
+    void display();
 };
 
 #endif // PK_H
