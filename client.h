@@ -18,6 +18,11 @@ public:
     ~Client();
 
     QTcpSocket *socket;
+    bool isConnected;
+    bool sendTxt(QString filename);
+    bool askTxt(QString filename);
+    QString askForSkill(QString out);
+    void closeSocket();
 private slots:
     void on_button_connect_clicked();
 
@@ -26,10 +31,12 @@ private slots:
     void socket_disconnected();
     void socket_read();
 
+    void on_button_test_clicked();
+
 private:
     Ui::Client *ui;
 
-    bool isConnected;
+
 };
 
 #endif // CLIENT_H

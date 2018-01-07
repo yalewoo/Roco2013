@@ -106,6 +106,8 @@ public:
     int should_use_huihe;
 
     //可以行动返回true
+    bool canMove();
+    //可以行动返回true 并过一回合
     bool selfStatus();
 
     void logofKezhi(double res);//显示属性克制信息

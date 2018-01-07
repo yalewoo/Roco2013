@@ -22,10 +22,8 @@ Pk::Pk(QWidget *parent) :
     team1.textedit_logs = ui->log;
     team2.textedit_logs = ui->log;
 
-
     connect(&team1, SIGNAL(updatePK()), this, SLOT(display()));
     connect(&team2, SIGNAL(updatePK()), this, SLOT(display()));
-
 
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
@@ -50,7 +48,7 @@ void Pk::initTeam()
     dead2 = false;
 
     team1.init(GlobalVar::pokes);
-    team2.init(GlobalVar::pokes);
+    team2.init(GlobalVar::pokes2);
 
     display();
 
@@ -60,27 +58,23 @@ void Pk::initTeam()
     log("【" + team2.name + "】召唤了【" + pokemons_all.at(team2.poks.at(0).pokemon.id).name + "】" );
 }
 
-void Pk::delay(int time)
-{
-    QTime _Timer = QTime::currentTime();
-    QTime _NowTimer;
-    do{
-        _NowTimer=QTime::currentTime();
-    }while (_Timer.msecsTo(_NowTimer)<=time);
-}
+
 
 void Pk::display()
 {
-    updatepoks_all(team1);
+    //显示换宠物界面6个宠物
+    displayGroups(team1);
+
+    //显示当前宠物的4个技能
     updateSkills(team1);
 
+    //左右两个宠物显示，hp，状态
     updatepok();
 
     ui->huihe->setText(QString::number(huihe));
 
+    //显示左右两个宠物状态
     updateStatus();
-
-
 }
 void Pk::log(QString log)
 {
@@ -130,7 +124,7 @@ QString Pk::getStatus(Team & team)
 }
 
 //更换队伍界面更新
-void Pk::updatepoks_all(Team & team)
+void Pk::displayGroups(Team & team)
 {
     QVector<Pok> & pokes = team.poks;
 
@@ -143,15 +137,24 @@ void Pk::updatepoks_all(Team & team)
 
     for (int i = 0; i < pokes.size(); ++i)
     {
+
         QString text = pokes.at(i).pokemon.name;
+        if (pokes.at(i).hp <= 0)
+            text = "已死亡";
+
         QString file;
         int id = pokes.at(i).pokemon.id;
         file.sprintf("F:/Project/Roco/Pic/gif/%d.gif", id);
 
         QListWidgetItem* l = new QListWidgetItem(QIcon(file), text, ui->poks);
         l->setSizeHint(QSize(105, 105));
+        if (team.poks[team.current_pok].hp <= 0)
+        {
 
+        }
         ui->poks->insertItem(i+1, l);
+
+
     }
 
 }
@@ -189,6 +192,11 @@ void Pk::updateSkills(Team & team)
             qpb[row]->setEnabled(false);
         else
             qpb[row]->setEnabled(true);
+
+        if (pokes[team.current_pok].hp == 0)
+        {
+            ui->tabWidget->setCurrentIndex(1);
+        }
 
 
 
@@ -278,22 +286,25 @@ void Pk::updatepok2()
 
 void Pk::skill_clicked(int i)
 {
-    ui->skill1->setEnabled(false);
-    ui->skill2->setEnabled(false);
-    ui->skill3->setEnabled(false);
-    ui->skill4->setEnabled(false);
-    display();
-
-    choose1 = i;
+    choose1 = team1.canMove() ? i : -1;
     choose2 = computer_ai(team2);
+
 
     if (dead1)
     {
         dead1 = false;
         team1.attack(choose1, team2);
-        ++huihe;
 
         display();
+        return;
+    }
+    if (dead2)
+    {
+        dead2 = false;
+        team2.attack(choose2, team1);
+
+        display();
+        return;
     }
 
 
@@ -378,26 +389,10 @@ void Pk::skill_clicked(int i)
     }
 
 
-    if (dead2)
-    {
-        choose2 = computer_ai(team2);
-        if (choose2 != 888888)
-        {
-            dead2 = false;
-            team2.attack(choose2, team1);
-        }
-
-    }
-
-
 
     ++huihe;
 
     display();
-    ui->skill1->setEnabled(true);
-    ui->skill2->setEnabled(true);
-    ui->skill3->setEnabled(true);
-    ui->skill4->setEnabled(true);
 }
 int Pk::calcSpeed(Team & team, int n)
 {
@@ -415,12 +410,8 @@ int Pk::calcSpeed(Team & team, int n)
         speed = speed / ((-1.0 * rank) * 0.5 + 1);
     }
 
-    if (n >= 100)
-    {
-        //换宠物
-
-    }
-    else
+    //出招
+    if (n >= 0 && n <= 3)
     {
         QVector<Skill> *skills_all = GlobalVar::skills_all;
 
@@ -431,6 +422,7 @@ int Pk::calcSpeed(Team & team, int n)
         int r = sk.speed;
         speed = 10000*r + speed;
     }
+
 
     return speed;
 }
@@ -465,7 +457,8 @@ void Pk::on_pushButton_clicked()
 
 int Pk::computer_ai(Team & team)
 {
-    bool use_computer = false;
+
+    bool use_computer = !client->isConnected;
     if (use_computer)
     {
         Pok & pok = team.poks[team.current_pok];
@@ -506,18 +499,7 @@ int Pk::computer_ai(Team & team)
              send = "change";
         }
 
-
-        client->socket->write(send.toLatin1());
-        client->socket->flush();
-
-        QByteArray buffer;
-        client->socket->waitForReadyRead();
-        buffer = client->socket->readAll();
-        QString str;
-        if (!buffer.isEmpty())
-        {
-            str = buffer;
-        }
+        QString str = client->askForSkill(send);
 
         qDebug() << "socket receive : " << str;
 

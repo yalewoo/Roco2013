@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>192.168.191.1</string>
+    <string>192.168.123.163</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="port">
@@ -109,6 +109,19 @@
      <width>421</width>
      <height>111</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_test">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>150</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>test</string>
    </property>
   </widget>
  </widget>

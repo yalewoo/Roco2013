@@ -15,6 +15,8 @@
 
 #include "globalvar.h"
 
+#include <client.h>
+
 namespace Ui {
 class SelectPet;
 }
@@ -28,6 +30,9 @@ class SelectPet : public QWidget
 public:
     explicit SelectPet(QWidget *parent = 0);
     ~SelectPet();
+
+    Client * client;
+
 
 private slots:
     void on_ok_clicked();
@@ -61,6 +66,8 @@ private slots:
 
     void on_load_clicked();
     void load(QString path);
+    void load(QVector<Pokemon> & pokes1, QString path);
+    void save(QString path);
 
     void on_start_clicked();
 
@@ -80,7 +87,9 @@ private:
 
     QVector<int> pokes_have_skills; //拥有可选技能的宠物id
 
-    QVector<Pokemon> pokes;  //用户选的宠物，最多6只
+    QVector<Pokemon> pokes;  //使用面板设置宠物
+    QVector<Pokemon> pokes1;  //用户1选的宠物，最多6只
+    QVector<Pokemon> pokes2;  //用户2选的宠物，最多6只
 
     QVector<QPair<int,int> > skills_selected;    //已选择的技能
 

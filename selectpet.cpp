@@ -736,41 +736,7 @@ void SelectPet::on_save_clicked()
         tr("*.txt")); //选择路径
     if(!filename.isEmpty())
     {
-        QFile file(filename);
-        if (!file.open(QIODevice::WriteOnly)) {
-            return;
-        }
-        QTextStream out(&file);
-
-        for (int i = 0; i < pokes.size(); ++i)
-        {
-            QString output;
-            output = QString::number(pokes[i].id);
-            output = output + "," + pokes[i].name + ",";
-            QString buf, buf2;
-            int skill_num = pokes[i].skills.size();
-
-            buf.sprintf("%d,%d,%d,%d,%d,%d,",
-                    pokes[i].hp, pokes[i].ad,pokes[i].dd,pokes[i].ap,pokes[i].dp,
-                    pokes[i].speed);
-            output += buf;
-
-            buf.sprintf("%d,%d,%d,%d,%d,%d,%d,%d",
-                    pokes[i].hpn, pokes[i].adn,pokes[i].ddn,pokes[i].apn,pokes[i].dpn,
-                    pokes[i].speedn,
-                        pokes[i].nature,
-                        skill_num);
-            output += buf;
-            for (int j = 0; j < pokes[i].skills.size(); ++j)
-            {
-                buf.sprintf(",%d.%d", pokes[i].skills[j].first, pokes[i].skills[j].second);
-                output += buf;
-            }
-
-
-            out << output << endl;
-        }
-        file.close();
+        save(filename);
     }
 
 }
@@ -858,9 +824,123 @@ void SelectPet::load(QString filename)
     updatepoks();
 }
 
+void SelectPet::load(QVector<Pokemon> &pokes2, QString filename)
+{
+    pokes2.clear();
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+
+    QTextStream * out = new QTextStream(&file);//文本流
+    QString all = out->readAll();
+    //qDebug() << all;
+    QStringList tempOption = all.split("\n");//每行以\n区分
+    for(int i = 0 ; i < tempOption.count() ; i++)
+    {
+        if (tempOption.at(i).size() == 0)
+            continue;
+         QStringList pl = tempOption.at(i).split(",");//一行中的单元格以，区分
+         int id = pl.at(0).toInt();
+         Pokemon pet(pl.at(0).toInt());
+         pet.name = pl.at(1);
+
+
+
+         pet.hp = pl.at(2).toInt();
+         pet.ad = pl.at(3).toInt();
+         pet.dd = pl.at(4).toInt();
+         pet.ap = pl.at(5).toInt();
+         pet.dp = pl.at(6).toInt();
+         pet.speed = pl.at(7).toInt();
+
+         pet.hpn = pl.at(8).toInt();
+         pet.adn = pl.at(9).toInt();
+         pet.ddn = pl.at(10).toInt();
+         pet.apn = pl.at(11).toInt();
+         pet.dpn = pl.at(12).toInt();
+         pet.speedn = pl.at(13).toInt();
+
+         pet.attr = pokemons_all[id].attr;
+         pet.attr2 = pokemons_all[id].attr2;
+
+         pet.nature = pl.at(14).toInt();
+
+         int skill_num = pl.at(15).toInt();
+         for (int j = 16; j < 16+skill_num; ++j)
+         {
+             QStringList huihe = pl.at(j).split(".");
+             QPair<int,int> qp;
+
+             if (huihe.count() == 2)
+             {
+                 qp.first = huihe.at(0).toInt();
+                 qp.second = huihe.at(1).toInt();
+             }
+
+             pet.skills.push_back(qp);
+         }
+
+
+         pokes2.push_back(pet);
+
+
+    }
+    file.close();//操作完成后记得关闭文件
+}
+
+void SelectPet::save(QString filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        return;
+    }
+    QTextStream out(&file);
+
+    for (int i = 0; i < pokes.size(); ++i)
+    {
+        QString output;
+        output = QString::number(pokes[i].id);
+        output = output + "," + pokes[i].name + ",";
+        QString buf, buf2;
+        int skill_num = pokes[i].skills.size();
+
+        buf.sprintf("%d,%d,%d,%d,%d,%d,",
+                pokes[i].hp, pokes[i].ad,pokes[i].dd,pokes[i].ap,pokes[i].dp,
+                pokes[i].speed);
+        output += buf;
+
+        buf.sprintf("%d,%d,%d,%d,%d,%d,%d,%d",
+                pokes[i].hpn, pokes[i].adn,pokes[i].ddn,pokes[i].apn,pokes[i].dpn,
+                pokes[i].speedn,
+                    pokes[i].nature,
+                    skill_num);
+        output += buf;
+        for (int j = 0; j < pokes[i].skills.size(); ++j)
+        {
+            buf.sprintf(",%d.%d", pokes[i].skills[j].first, pokes[i].skills[j].second);
+            output += buf;
+        }
+
+
+        out << output << endl;
+    }
+    file.close();
+}
+
 void SelectPet::on_start_clicked()
 {
     GlobalVar::pokes = &pokes;
+
+    save("upload.txt");
+
+    client->sendTxt("upload.txt");
+    client->askTxt("team2.txt");
+
+    load(pokes2, "team2.txt");
+    GlobalVar::pokes2 = &pokes2;
 
     emit startGame();
 }

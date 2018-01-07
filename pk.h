@@ -21,7 +21,6 @@ public:
 
     void initTeam();
 
-    void delay(int time);
 
         Client * client;
 
@@ -50,7 +49,7 @@ private:
     bool dead1 = false;
     bool dead2 = false;
 
-    void updatepoks_all(Team & team);
+    void displayGroups(Team & team);
     void updateSkills(Team & team);
     void updatepok();
     void updatepok1();

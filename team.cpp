@@ -89,10 +89,7 @@ void Team::delay(int msec)
     while( QTime::currentTime() <dieTime )
     QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
-AttackData attack(QPair<int,int> skill, Team & enemy, AttackData res = 0)
-{
 
-}
 
 AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
 {
@@ -100,14 +97,14 @@ AttackData Team::attack(int skill_id, Team & enemy, AttackData last)
     res.clear();
 
 
-    if (skill_id >= 100 && skill_id <= 200)
+    if (skill_id >= 100 && skill_id <= 105)
     {
         //换宠物
         int new_id = skill_id % 10;
         current_pok = new_id;
         log("【" + name + "】换上了【" + this->poks[new_id].pokemon.name + "】");
     }
-    else
+    else if (skill_id >= 0 && skill_id <= 3)
     {
 
         Pok & pok = poks[current_pok];
@@ -639,11 +636,13 @@ void Team::init(QVector<Pokemon> *ppokes)
     current_pok = 0;
 }
 
+bool Team::canMove()
+{
+    return sleep <= 0 && bingdong <= 0;
+}
 
 bool Team::selfStatus()
 {
-
-
     bool res = true;
     if (sleep > 0)
     {

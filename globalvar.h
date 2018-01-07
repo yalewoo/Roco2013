@@ -12,6 +12,7 @@ public:
     GlobalVar();
     static QVector<QPair<int,int> > *poke_skills;
     static QVector<Pokemon> *pokes;
+    static QVector<Pokemon> *pokes2;
     static QVector<Skill> *skills_all;
     static QVector<Pokemon> * pokemons_all;
 };

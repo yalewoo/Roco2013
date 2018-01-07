@@ -28,7 +28,8 @@ private:
     SelectPet * selectPet;
     Client * client;
 
-
+protected:
+    void closeEvent( QCloseEvent * event );
 };
 
 #endif // MAINWINDOW_H
